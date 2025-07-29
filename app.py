@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
-from bunker_mod import return_attendance, return_cgpa, data_json
+from flask import Flask, render_template, request
+from bunker_mod import return_attendance, data_json, return_cgpa
 
 app = Flask(__name__)
 
@@ -12,14 +12,15 @@ def login():
     rollno = request.form['rollno']
     password = request.form['password']
 
-    raw_data, session = return_attendance(rollno, password)
-    if isinstance(raw_data, str):
-        return f"<h2>{raw_data}</h2>"
+    result = return_attendance(rollno, password)
+    if isinstance(result, str):
+        return render_template("index.html", error=result)
 
-    attendance_data = data_json(raw_data)
+    attendance_raw, session = result
+    attendance_data = data_json(attendance_raw)
     cgpa_data = return_cgpa(session)
 
-    return render_template('dashboard.html',
+    return render_template("dashboard.html",
                            rollno=rollno,
                            attendance=attendance_data,
                            cgpa=cgpa_data)
