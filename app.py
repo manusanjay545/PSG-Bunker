@@ -1,41 +1,28 @@
-from flask import Flask, render_template, request
-from bunker_mod import return_attendance, data_json, return_cgpa
+from flask import Flask, render_template, request, redirect, url_for
+from bunker_mod import return_attendance, return_cgpa, data_json
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route('/attendance', methods=['POST'])
-def attendance():
+@app.route('/login', methods=['POST'])
+def login():
     rollno = request.form['rollno']
     password = request.form['password']
 
-    result = return_attendance(rollno, password)
+    raw_data, session = return_attendance(rollno, password)
+    if isinstance(raw_data, str):
+        return f"<h2>{raw_data}</h2>"
 
-    if isinstance(result, str):
-        return render_template("index.html", error=result)
-
-    attendance_data_raw, session = result
-    attendance_data = data_json(attendance_data_raw)
-
-    return render_template("attendance.html", data=attendance_data)
-
-@app.route('/cgpa', methods=['POST'])
-def cgpa():
-    rollno = request.form['rollno']
-    password = request.form['password']
-
-    result = return_attendance(rollno, password)
-
-    if isinstance(result, str):
-        return render_template("index.html", error=result)
-
-    _, session = result
+    attendance_data = data_json(raw_data)
     cgpa_data = return_cgpa(session)
 
-    return render_template("cgpa.html", cgpa=cgpa_data)
+    return render_template('dashboard.html',
+                           rollno=rollno,
+                           attendance=attendance_data,
+                           cgpa=cgpa_data)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
