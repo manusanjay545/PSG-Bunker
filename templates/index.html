@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PSG Bunker</title>
+  <title>PSG Bunker Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -12,177 +12,73 @@
       background-color: #121212;
       color: #ffffff;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 40px 20px;
-      animation: fadeIn 1s ease-in;
-      min-height: 100vh;
-      position: relative;
+      height: 100vh;
+      padding: 20px;
     }
 
-    .login-box, .menu-box, .content-box {
+    .login-box {
       background: #1f1f1f;
-      padding: 20px;
+      padding: 30px;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.6);
       width: 100%;
       max-width: 400px;
-      margin-bottom: 20px;
-      animation: slideUp 0.5s ease-in-out;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
-    .login-box input {
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .login-box input, .login-box button {
       width: 100%;
-      margin-top: 10px;
+      margin: 10px 0;
       padding: 12px;
       border: none;
       border-radius: 8px;
       font-size: 16px;
+    }
+
+    .login-box input {
       background: #2b2b2b;
       color: white;
     }
 
     .login-box button {
-      width: 100%;
-      margin-top: 15px;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
       background: #007bff;
       color: white;
-      cursor: pointer;
       font-weight: bold;
-    }
-
-    .menu-box button {
-      width: 100%;
-      margin: 10px 0;
-      padding: 15px;
-      background: #292929;
-      border: none;
-      border-radius: 20px;
-      color: #f1f1f1;
-      font-size: 18px;
       cursor: pointer;
-      transition: background 0.3s ease, transform 0.3s ease;
-      font-weight: bold;
     }
 
-    .menu-box button:hover {
-      background: #383838;
-      transform: scale(1.02);
-    }
-
-    .subject-box {
-      background-color: #1e1e1e;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
-    }
-
-    .green { color: #00ff99; font-weight: bold; }
-    .red { color: #ff4c4c; font-weight: bold; }
-
-    .hidden { display: none; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    .error {
+      color: #ff4c4c;
+      text-align: center;
+      margin-top: 10px;
     }
 
     footer {
-      margin-top: auto;
+      margin-top: 20px;
+      text-align: center;
       font-size: 12px;
       color: #888;
-      padding: 20px;
-      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="login-box" id="loginBox">
-    <h2 style="text-align:center;">🎓 PSG Bunker</h2>
-    <input type="text" id="rollno" placeholder="Roll No" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-  </div>
-
-  <div class="menu-box hidden" id="menuBox">
-    <button onclick="showAttendance()">View Attendance</button>
-    <button onclick="showCGPA()">View CGPA</button>
-  </div>
-
-  <div class="content-box hidden" id="attendanceBox">
-    <h3 style="text-align:center;">📊 Attendance Info</h3>
-    <div id="attendanceList"></div>
-  </div>
-
-  <div class="content-box hidden" id="cgpaBox">
-    <h3 style="text-align:center;">🎯 CGPA Info</h3>
-    <p id="cgpaText" style="text-align:center;font-size:18px;"></p>
-  </div>
-
-  <footer>
-    © 2025 PSG Bunker | Developed by Manu Sanjay (24I434) - B.Tech IT, PSG Tech
-  </footer>
-
-  <script>
-    function login() {
-      document.getElementById('loginBox').classList.add('hidden');
-      document.getElementById('menuBox').classList.remove('hidden');
-    }
-
-    function showAttendance() {
-      document.getElementById('cgpaBox').classList.add('hidden');
-      document.getElementById('attendanceBox').classList.remove('hidden');
-      const container = document.getElementById('attendanceList');
-      container.innerHTML = `
-        <div class="subject-box">
-          <strong>Subject:</strong> Maths<br>
-          <strong>Attendance:</strong> <span class="green">82%</span><br>
-          <strong>Total Classes:</strong> 40<br>
-          <strong>Attended:</strong> 33<br>
-          <strong>Status:</strong> <span class="green">Can bunk 3</span>
-        </div>
-        <div class="subject-box">
-          <strong>Subject:</strong> Physics<br>
-          <strong>Attendance:</strong> <span class="red">67%</span><br>
-          <strong>Total Classes:</strong> 40<br>
-          <strong>Attended:</strong> 27<br>
-          <strong>Status:</strong> <span class="red">Attend 5</span>
-        </div>
-        <div class="subject-box">
-          <strong>Subject:</strong> Chemistry<br>
-          <strong>Attendance:</strong> <span class="green">78%</span><br>
-          <strong>Total Classes:</strong> 45<br>
-          <strong>Attended:</strong> 35<br>
-          <strong>Status:</strong> <span class="green">Can bunk 2</span>
-        </div>
-        <div class="subject-box">
-          <strong>Subject:</strong> Computer Science<br>
-          <strong>Attendance:</strong> <span class="red">70%</span><br>
-          <strong>Total Classes:</strong> 50<br>
-          <strong>Attended:</strong> 35<br>
-          <strong>Status:</strong> <span class="red">Attend 6</span>
-        </div>
-      `;
-    }
-
-    function showCGPA() {
-      document.getElementById('attendanceBox').classList.add('hidden');
-      document.getElementById('cgpaBox').classList.remove('hidden');
-      document.getElementById('cgpaText').textContent = 'Your CGPA is 8.72';
-    }
-  </script>
+  <form class="login-box" method="POST" action="/login">
+    <h2>🎓 PSG Bunker</h2>
+    <input type="text" name="rollno" placeholder="Roll No" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button type="submit">Login</button>
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+    <footer>
+      © 2025 PSG Bunker | Developed by Manu Sanjay (24I434) - B.Tech IT, PSG Tech
+    </footer>
+  </form>
 </body>
 </html>
