@@ -16,6 +16,8 @@
       align-items: center;
       padding: 40px 20px;
       animation: fadeIn 1s ease-in;
+      min-height: 100vh;
+      position: relative;
     }
 
     .login-box, .menu-box, .content-box {
@@ -27,18 +29,29 @@
       max-width: 400px;
       margin-bottom: 20px;
       animation: slideUp 0.5s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .login-box input, .login-box button {
+    .login-box input {
       width: 100%;
       margin-top: 10px;
       padding: 12px;
       border: none;
       border-radius: 8px;
       font-size: 16px;
+      background: #2b2b2b;
+      color: white;
     }
 
     .login-box button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
       background: #007bff;
       color: white;
       cursor: pointer;
@@ -86,6 +99,14 @@
       from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
+
+    footer {
+      margin-top: auto;
+      font-size: 12px;
+      color: #888;
+      padding: 20px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -111,9 +132,12 @@
     <p id="cgpaText" style="text-align:center;font-size:18px;"></p>
   </div>
 
+  <footer>
+    © 2025 PSG Bunker | Developed by Manu Sanjay (24I434) - B.Tech IT, PSG Tech
+  </footer>
+
   <script>
     function login() {
-      // You can add actual login verification here later
       document.getElementById('loginBox').classList.add('hidden');
       document.getElementById('menuBox').classList.remove('hidden');
     }
@@ -136,6 +160,20 @@
           <strong>Total Classes:</strong> 40<br>
           <strong>Attended:</strong> 27<br>
           <strong>Status:</strong> <span class="red">Attend 5</span>
+        </div>
+        <div class="subject-box">
+          <strong>Subject:</strong> Chemistry<br>
+          <strong>Attendance:</strong> <span class="green">78%</span><br>
+          <strong>Total Classes:</strong> 45<br>
+          <strong>Attended:</strong> 35<br>
+          <strong>Status:</strong> <span class="green">Can bunk 2</span>
+        </div>
+        <div class="subject-box">
+          <strong>Subject:</strong> Computer Science<br>
+          <strong>Attendance:</strong> <span class="red">70%</span><br>
+          <strong>Total Classes:</strong> 50<br>
+          <strong>Attended:</strong> 35<br>
+          <strong>Status:</strong> <span class="red">Attend 6</span>
         </div>
       `;
     }
