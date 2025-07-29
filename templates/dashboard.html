@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | PSG Bunker</title>
+  <style>
+    body {
+      background-color: #121212; color: white;
+      font-family: sans-serif; padding: 20px;
+    }
+    h2, h3 { text-align: center; }
+    button {
+      width: 100%; padding: 10px;
+      margin-bottom: 10px;
+      background: #333; color: white;
+      border: none; border-radius: 8px;
+    }
+    table {
+      width: 100%; margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px; border-bottom: 1px solid #333;
+    }
+    .green { color: #00ff00; }
+    .red { color: #ff4c4c; }
+  </style>
+</head>
+<body>
+  <h2>Welcome, {{ rollno }}</h2>
+
+  <button onclick="toggle('attendanceBox')">View Attendance</button>
+  <button onclick="toggle('cgpaBox')">View CGPA</button>
+
+  <div id="attendanceBox" style="display:none">
+    <h3>Attendance Info</h3>
+    <table>
+      <tr><th>Subject</th><th>Attendance</th><th>Status</th></tr>
+      {% for subject in attendance %}
+        <tr>
+          <td>{{ subject.name }}</td>
+          <td class="{{ 'green' if subject.percentage_of_attendance >= 75 else 'red' }}">
+            {{ subject.percentage_of_attendance }}%
+          </td>
+          <td class="{{ 'green' if subject.percentage_of_attendance >= 75 else 'red' }}">
+            {% if subject.percentage_of_attendance >= 75 %}
+              Can bunk {{ subject.class_to_bunk }}
+            {% else %}
+              Attend {{ subject.class_to_attend }}
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div id="cgpaBox" style="display:none">
+    <h3>CGPA Info</h3>
+    <p>Latest Semester: {{ cgpa.lastest_sem }}</p>
+    <p>CGPA: {{ cgpa.latest_sem_cgpa }}</p>
+  </div>
+
+  <script>
+    function toggle(id) {
+      document.getElementById('attendanceBox').style.display = 'none';
+      document.getElementById('cgpaBox').style.display = 'none';
+      document.getElementById(id).style.display = 'block';
+    }
+  </script>
+</body>
+</html>
