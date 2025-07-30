@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calendar – Tamil Nadu Holidays</title>
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+    #calendar {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      color: black;
+    }
+    a.back-button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      background: #444;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <a class="back-button" href="/dashboard">← Back to Dashboard</a>
+  <h2>Tamil Nadu Holidays – 2025</h2>
+  <div id="calendar"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const holidayList = [
+        { date: '2025-01-01', title: 'New Year' },
+        { date: '2025-01-14', title: 'Pongal' },
+        { date: '2025-01-15', title: 'Thiruvalluvar Day' },
+        { date: '2025-01-16', title: 'Uzhavar Thirunal' },
+        { date: '2025-01-26', title: 'Republic Day' },
+        { date: '2025-02-11', title: 'Thai Poosam' },
+        { date: '2025-03-30', title: 'Telugu New Year' },
+        { date: '2025-03-31', title: 'Ramzan' },
+        { date: '2025-04-01', title: 'Bank Closing' },
+        { date: '2025-04-10', title: 'Mahaveer Jayanthi' },
+        { date: '2025-04-14', title: 'Tamil New Year' },
+        { date: '2025-04-18', title: 'Good Friday' },
+        { date: '2025-05-01', title: 'Labour Day' },
+        { date: '2025-06-07', title: 'Bakrid' },
+        { date: '2025-07-06', title: 'Muharram' },
+        { date: '2025-08-15', title: 'Independence Day' },
+        { date: '2025-08-16', title: 'Krishna Jayanthi' },
+        { date: '2025-08-27', title: 'Vinayakar Chathurthi' },
+        { date: '2025-09-05', title: 'Milad-un-Nabi' },
+        { date: '2025-10-01', title: 'Ayutha Pooja' },
+        { date: '2025-10-02', title: 'Vijaya Dashami' },
+        { date: '2025-10-20', title: 'Deepavali' },
+        { date: '2025-12-25', title: 'Christmas' }
+      ];
+
+      const events = holidayList.map(h => ({
+        title: h.title,
+        start: h.date,
+        color: 'red'
+      }));
+
+      const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+        initialView: 'dayGridMonth',
+        events: events,
+        height: 600
+      });
+
+      calendar.render();
+    });
+  </script>
+</body>
+</html>
