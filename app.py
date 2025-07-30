@@ -32,6 +32,11 @@ def robots():
 @app.route('/sitemap.xml')
 def sitemap():
     return app.send_static_file('sitemap.xml')
+
+@app.route("/calendar")
+def calendar_page():
+    return render_template("calendar.html")
+
     
 
 if __name__ == '__main__':
