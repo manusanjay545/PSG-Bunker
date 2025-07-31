@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" href="/logo.ico" type="image/x-icon">
+  <link rel="icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
   <title>Dashboard | PSG Bunker</title>
   <style>
     body {
@@ -23,10 +23,22 @@
       padding: 15px;
       margin-bottom: 15px;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+      overflow-wrap: break-word;
     }
 
     .green { color: #00ff99; font-weight: bold; }
     .red { color: #ff4c4c; font-weight: bold; }
+
+    button {
+      background-color: #00ff99;
+      color: #121212;
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 30px;
+    }
 
     footer {
       text-align: center;
@@ -59,15 +71,38 @@
     </div>
   {% endfor %}
 
+  <p style="text-align:center; font-size: 12px; color: #aaa;">
+    Last Updated: {{ last_updated }}
+  </p>
+
   <h3>🎯 CGPA Info</h3>
   <p style="text-align:center;">
-    Latest Semester: {{ cgpa.lastest_sem }}<br>
+    Latest Semester: {{ cgpa.latest_sem }}<br>
     CGPA: {{ cgpa.latest_sem_cgpa }}
   </p>
 
+  <div style="text-align:center;">
+    <button onclick="shareLink()">🔗 Share PSG Bunker</button>
+  </div>
 
   <footer>
     © 2025 PSG Bunker | Developed by Student - Manu Sanjay - B.Tech IT, PSG Tech
   </footer>
+
+  <script>
+    function shareLink() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'PSG Bunker',
+          text: 'Check out PSG Bunker – track your attendance & CGPA!',
+          url: 'https://psgbunker.info'
+        }).then(() => {
+          console.log('Thanks for sharing!');
+        }).catch(console.error);
+      } else {
+        alert("Sharing not supported on this browser. Copy this link: https://psgbunker.info");
+      }
+    }
+  </script>
 </body>
 </html>
