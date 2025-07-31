@@ -37,6 +37,15 @@ def sitemap():
 def calendar_page():
     return render_template("calendar.html")
 
+from flask import send_from_directory
+
+@app.route('/logo.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'logo.ico', mimetype='image/vnd.microsoft.icon')
+
+    
+
     
 
 if __name__ == '__main__':
