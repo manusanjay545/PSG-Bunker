@@ -132,3 +132,35 @@ def return_cgpa(session):
         
     except Exception as e:
         return {"error": str(e)}
+
+def return_attendance_itech(username, pwd):
+    try:
+        session = requests.Session()
+        login_url = "https://laudea.psgitech.ac.in/api/auth/login"
+        payload = {"username": username, "password": pwd}
+        r = session.post(login_url, json=payload)
+        if r.status_code != 200:
+            return "Invalid credentials for PSG iTech"
+        att_url = "https://laudea.psgitech.ac.in/api/attendance/student"
+        att_data = session.get(att_url).json()
+        if "attendanceDetails" not in att_data:
+            return "Attendance data not available"
+        data = []
+        for sub in att_data["attendanceDetails"]:
+            total_hours = sub.get("totalHours", 0)
+            present_hours = sub.get("presentHours", 0)
+            percentage = (present_hours / total_hours) * 100 if total_hours else 0
+            temp = {
+                "name": sub.get("subjectName", ""),
+                "total_hours": total_hours,
+                "total_present": present_hours,
+                "percentage_of_attendance": round(percentage, 2)
+            }
+            if percentage < 75:
+                temp["class_to_attend"] = math.ceil((0.75 * total_hours - present_hours) / 0.25)
+            else:
+                temp["class_to_bunk"] = math.floor((present_hours - 0.75 * total_hours) / 0.75)
+            data.append(temp)
+        return data, session
+    except Exception as e:
+        return f"Error: {str(e)}"
