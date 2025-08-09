@@ -2,115 +2,190 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-
-  <title>PSG Bunker - Attendance & CGPA Tracker for PSG Tech</title>
-  <meta name="description" content="Track your PSG Tech attendance, calculate how many classes you can bunk, and view your CGPA. Built for B.Tech, MSc, Diploma students of PSG College of Technology, Coimbatore." />
-  <meta name="keywords" content="psg tech, psg college of technology, coimbatore, psgtech attendance, psg cgpa, psg student login, attendance tracker, cgpa calculator, IT department, textile, mechanical, MSc, diploma, psg tech portal, student zone, PSG Bunker, 24I434, Manu Sanjay" />
-  <meta name="robots" content="index, follow" />
-  <meta name="author" content="Manu Sanjay, B.Tech IT, PSG Tech" />
-  <meta name="language" content="en" />
-  <meta name="theme-color" content="#121212" />
-
-  <meta name="google-site-verification" content="YOUR-GOOGLE-VERIFICATION-CODE" />
-
-  <meta property="og:title" content="PSG Bunker - PSG Tech Attendance & CGPA Tracker" />
-  <meta property="og:description" content="Check your PSG Tech attendance and CGPA from one clean dashboard. Built for PSG College of Technology students." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://psgbunker.info" />
-  <meta property="og:image" content="https://psgbunker.info/assets/preview.png" />
-
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="PSG Bunker - PSG Tech Attendance & CGPA Tracker" />
-  <meta name="twitter:description" content="Track attendance, bunk limit, and CGPA for PSG College of Technology - built by Manu Sanjay." />
-  <meta name="twitter:image" content="https://psgbunker.info/assets/preview.png" />
-
-  
-  <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet" />
-  <link rel="icon" href="/logo.ico" type="image/x-icon">
-
-
-
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PSG Bunker Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Check your PSG Tech attendance and CGPA easily using PSG Bunker — a student portal tool for PSG College of Technology and PSG iTech." />
+  <meta name="keywords" content="PSG Bunker, PSG Attendance, PSG CGPA, PSG Tech, PSG iTech, PSG College App, Bunk Calculator, Student Zone" />
+  <meta name="author" content="Manu Sanjay" />
+  <title>📚 PSG Bunker - Attendance & CGPA Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
+      padding: 20px;
       font-family: 'Rubik', sans-serif;
       background-color: #121212;
-      color: #ffffff;
+      color: #f0f0f0;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
-      padding: 20px;
     }
-
-    .login-box {
-      background: #1f1f1f;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      color: #00e676;
+      text-align: center;
+    }
+    #login, #dashboard, #cgpaPage, #collegeSelect {
       width: 100%;
       max-width: 400px;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+      animation: fadeIn 1s ease-in-out;
     }
-
-    .login-box h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .login-box input, .login-box button {
+    input, button {
       width: 100%;
-      margin: 10px 0;
       padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      font-size: 1rem;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
+      outline: none;
     }
-
-    .login-box input {
-      background: #2b2b2b;
-      color: white;
+    input {
+      background: #333;
+      color: #fff;
     }
-
-    .login-box button {
-      background: #007bff;
-      color: white;
+    button {
+      background-color: #00e676;
+      color: #000;
       font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s;
     }
-
-    .error {
-      color: #ff4c4c;
-      text-align: center;
-      margin-top: 10px;
+    button:hover {
+      background-color: #00c853;
     }
-
-    footer {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 12px;
-      color: #888;
-    }
+    p { font-size: 0.95rem; line-height: 1.5; }
+    .subject { margin-top: 10px; padding: 10px; border-radius: 8px; background-color: #2b2b2b; }
+    .green { color: #00e676; }
+    .red { color: #ff5252; }
+    nav { margin: 10px 0; display: flex; gap: 10px; justify-content: center; }
+    nav button { flex: 1; background-color: #333; color: white; }
+    nav button.active { background-color: #00e676; color: #000; }
+    footer { margin-top: 20px; font-size: 0.8rem; color: #888; text-align: center; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
-  <form class="login-box" method="POST" action="/login">
-    <h2>🎓 PSG Bunker</h2>
-    <input type="text" name="rollno" placeholder="Roll No" required />
-    <input type="password" name="password" placeholder="Password" required />
-    <button type="submit">Login</button>
-    {% if error %}
-      <p class="error">{{ error }}</p>
-    {% endif %}
-    <footer>
-      © 2025 PSG Bunker | Developed by Student - Manu Sanjay - B.Tech IT, PSG Tech
-    </footer>
-  </form>
+  <h1>📚 PSG Bunker</h1>
+
+  <div id="collegeSelect">
+    <button onclick="selectCollege('tech')">PSG Tech</button>
+    <button onclick="selectCollege('itech')">PSG iTech</button>
+  </div>
+
+  <div id="login" style="display:none;">
+    <input id="roll" placeholder="Roll No" />
+    <input id="pwd" type="password" placeholder="Password" />
+    <button onclick="doLogin()">Login</button>
+    <p id="loginMsg"></p>
+  </div>
+
+  <nav id="navBar" style="display:none;">
+    <button id="btn-att" onclick="showTab('attendance')" class="active">Attendance</button>
+    <button id="btn-cgpa" onclick="showTab('cgpa')">CGPA</button>
+  </nav>
+
+  <div id="dashboard" style="display:none;">
+    <p><strong>Total Days:</strong> <span id="tot"></span></p>
+    <p><strong>Attended Days:</strong> <span id="att"></span></p>
+    <p><strong>Attendance:</strong> <span id="pct"></span>%</p>
+    <p id="advice" style="font-weight: bold;"></p>
+    <div id="subjectData"></div>
+  </div>
+
+  <div id="cgpaPage" style="display:none;">
+    <p><strong>Latest Semester:</strong> <span id="sem"></span></p>
+    <p><strong>CGPA:</strong> <span id="cgpa"></span></p>
+  </div>
+
+  <footer>
+    Developed by <strong>Manu Sanjay</strong> - PSG Bunker<br>
+    &copy; 2025 PSG Bunker. All rights reserved.
+  </footer>
+
+<script>
+let active = 'attendance';
+let selectedCollege = null;
+
+function selectCollege(college) {
+  selectedCollege = college;
+  document.getElementById('collegeSelect').style.display = 'none';
+  document.getElementById('login').style.display = 'block';
+}
+
+function showTab(tab) {
+  active = tab;
+  document.getElementById('dashboard').style.display = tab === 'attendance' ? 'block' : 'none';
+  document.getElementById('cgpaPage').style.display = tab === 'cgpa' ? 'block' : 'none';
+  document.getElementById('btn-att').classList.toggle('active', tab === 'attendance');
+  document.getElementById('btn-cgpa').classList.toggle('active', tab === 'cgpa');
+}
+
+async function doLogin() {
+  const res = await fetch('/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      rollno: document.getElementById('roll').value,
+      password: document.getElementById('pwd').value,
+      college: selectedCollege
+    })
+  });
+  const j = await res.json();
+  if (!j.ok) {
+    document.getElementById('loginMsg').textContent = j.message;
+  } else {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('navBar').style.display = 'flex';
+    loadAttendance();
+    if (selectedCollege === 'tech') loadCGPA();
+  }
+}
+
+async function loadAttendance() {
+  const resp = await fetch('/attendance');
+  const j = await resp.json();
+  if (j.error) return alert(j.error);
+  document.getElementById('tot').textContent = j.total_days;
+  document.getElementById('att').textContent = j.attended_days;
+  document.getElementById('pct').textContent = j.percentage.toFixed(2);
+  const advice = j.percentage < 75
+    ? `⚠️ You must attend ${j.need_days} more day(s) to reach 75%.`
+    : `✅ You can bunk up to ${j.bunkable_days} more day(s).`;
+  document.getElementById('advice').textContent = advice;
+  document.getElementById('advice').className = j.percentage < 75 ? 'red' : 'green';
+  const container = document.getElementById('subjectData');
+  container.innerHTML = '';
+  j.subjects.forEach(sub => {
+    const div = document.createElement('div');
+    div.className = 'subject';
+    const statusClass = sub.percentage_of_attendance < 75 ? 'red' : 'green';
+    let extraInfo = '';
+    if (sub.class_to_bunk !== undefined) {
+      extraInfo = `<span class="green">You can bunk ${sub.class_to_bunk} classes</span>`;
+    } else if (sub.class_to_attend !== undefined) {
+      extraInfo = `<span class="red">You must attend ${sub.class_to_attend} classes</span>`;
+    }
+    div.innerHTML = `<strong>${sub.name}</strong><br>
+      Total Hours: ${sub.total_hours}<br>
+      Present: ${sub.total_present}<br>
+      Attendance: <span class="${statusClass}">${sub.percentage_of_attendance}%</span><br>
+      ${extraInfo}`;
+    container.appendChild(div);
+  });
+  showTab(active);
+}
+
+async function loadCGPA() {
+  const resp = await fetch('/cgpa');
+  const j = await resp.json();
+  if (j.error) return;
+  document.getElementById('sem').textContent = j.lastest_sem;
+  document.getElementById('cgpa').textContent = j.latest_sem_cgpa;
+}
+</script>
 </body>
 </html>
