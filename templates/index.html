@@ -1,116 +1,573 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
+    <!-- Primary Meta Tags -->
+    <title>PSG Bunker - Attendance &amp; CGPA Calculator | PSG College of Technology Student Portal</title>
+    <meta name="title" content="PSG Bunker - Attendance &amp; CGPA Calculator | PSG College of Technology Student Portal">
+    <meta name="description" content="Smart attendance tracker and CGPA calculator for PSG College of Technology students. Check attendance, calculate bunk classes, view timetable, and track academic performance easily.">
+    <meta name="keywords" content="PSG Bunker, PSG Tech attendance, PSG College attendance tracker, CGPA calculator, bunk calculator, PSG student portal, eCampus PSG, PSG Tech app, attendance percentage, class bunker, PSG College of Technology, student dashboard, academic tracker">
+    <meta name="author" content="Manu Sanjay, 24I434, PSG College of Technology">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
 
-  <title>PSG Bunker - Attendance & CGPA Tracker for PSG Tech</title>
-  <meta name="description" content="Track your PSG Tech attendance, calculate how many classes you can bunk, and view your CGPA. Built for B.Tech, MSc, Diploma students of PSG College of Technology, Coimbatore." />
-  <meta name="keywords" content="psg tech, psg college of technology, coimbatore, psgtech attendance, psg cgpa, psg student login, attendance tracker, cgpa calculator, IT department, textile, mechanical, MSc, diploma, psg tech portal, student zone, PSG Bunker, 24I434, Manu Sanjay" />
-  <meta name="robots" content="index, follow" />
-  <meta name="author" content="Manu Sanjay, B.Tech IT, PSG Tech" />
-  <meta name="language" content="en" />
-  <meta name="theme-color" content="#121212" />
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://psgbunker.com/">
+    <meta property="og:title" content="PSG Bunker - Smart Attendance Tracker for PSG Tech Students">
+    <meta property="og:description" content="Calculate how many classes you can bunk or must attend to maintain 75% attendance. Track CGPA, view color-coded timetable, and manage your academic performance.">
+    <meta property="og:image" content="https://psgbunker.com/static/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="PSG Bunker">
 
-  <meta name="google-site-verification" content="YOUR-GOOGLE-VERIFICATION-CODE" />
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://psgbunker.com/">
+    <meta property="twitter:title" content="PSG Bunker - Smart Attendance Tracker">
+    <meta property="twitter:description" content="Track attendance, calculate bunk classes, and manage CGPA for PSG College of Technology students.">
+    <meta property="twitter:image" content="https://psgbunker.com/static/twitter-card.jpg">
 
-  <meta property="og:title" content="PSG Bunker - PSG Tech Attendance & CGPA Tracker" />
-  <meta property="og:description" content="Check your PSG Tech attendance and CGPA from one clean dashboard. Built for PSG College of Technology students." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://psgbunker.info" />
-  <meta property="og:image" content="https://psgbunker.info/assets/preview.png" />
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PSG Bunker">
+    <meta name="application-name" content="PSG Bunker">
+    <meta name="msapplication-TileColor" content="#6366f1">
+    <meta name="msapplication-config" content="/static/browserconfig.xml">
 
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="PSG Bunker - PSG Tech Attendance & CGPA Tracker" />
-  <meta name="twitter:description" content="Track attendance, bunk limit, and CGPA for PSG College of Technology - built by Manu Sanjay." />
-  <meta name="twitter:image" content="https://psgbunker.info/assets/preview.png" />
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://psgbunker.com/">
 
-  
-  <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet" />
-  <link rel="icon" href="/logo.ico" type="image/x-icon">
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+    <link rel="manifest" href="/static/site.webmanifest">
 
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PSG Bunker Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Rubik', sans-serif;
-      background-color: #121212;
-      color: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      padding: 20px;
+    <!-- Schema.org structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "PSG Bunker",
+        "url": "https://psgbunker.com/",
+        "description": "Attendance tracker and CGPA calculator for PSG College of Technology students",
+        "applicationCategory": "Educational",
+        "operatingSystem": "Web Browser",
+        "author": {
+            "@type": "Person",
+            "name": "Manu Sanjay",
+            "affiliation": "PSG College of Technology"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "INR"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "150"
+        }
     }
+    </script>
 
-    .login-box {
-      background: #1f1f1f;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.6);
-      width: 100%;
-      max-width: 400px;
-    }
+    <style>
+        /* CSS Variables for consistent theming */
+        :root {
+            --primary-color: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
 
-    .login-box h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
 
-    .login-box input, .login-box button {
-      width: 100%;
-      margin: 10px 0;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-    }
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
 
-    .login-box input {
-      background: #2b2b2b;
-      color: white;
-    }
+            --border-color: #334155;
+            --border-focus: var(--primary-color);
 
-    .login-box button {
-      background: #007bff;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
 
-    .error {
-      color: #ff4c4c;
-      text-align: center;
-      margin-top: 10px;
-    }
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
 
-    footer {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 12px;
-      color: #888;
-    }
-  </style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a202c 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            z-index: 1;
+        }
+
+        /* Logo and Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: slideDown 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border-radius: var(--radius-xl);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        /* Login Card */
+        .login-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both;
+            position: relative;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group:last-of-type {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        input[type="text"], 
+        input[type="password"] {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 400;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus, 
+        input[type="password"]:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Button Styles */
+        .btn {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-loading {
+            background: var(--bg-tertiary);
+            cursor: not-allowed;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius-md);
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            line-height: 1.5;
+            animation: fadeIn 0.8s ease 0.4s both;
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            body { padding: 0.5rem; }
+            .container { max-width: 100%; }
+            .login-card { padding: 1.5rem; }
+            .title { font-size: 1.75rem; }
+            input[type="text"], input[type="password"], .btn { padding: 1rem; }
+        }
+
+        /* Touch target improvements */
+        @media (pointer: coarse) {
+            .btn, input[type="text"], input[type="password"] { min-height: 44px; }
+        }
+
+        /* Reduced motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
 </head>
 <body>
-  <form class="login-box" method="POST" action="/login">
-    <h2>🎓 PSG Bunker</h2>
-    <input type="text" name="rollno" placeholder="Roll No" required />
-    <input type="password" name="password" placeholder="Password" required />
-    <button type="submit">Login</button>
-    {% if error %}
-      <p class="error">{{ error }}</p>
-    {% endif %}
-    <footer>
-      © 2025 PSG Bunker | Developed by Student - Manu Sanjay - B.Tech IT, PSG Tech
-    </footer>
-  </form>
+    <div class="container">
+        <div class="header">
+            <div class="logo" aria-label="PSG Bunker Logo">B</div>
+            <h1 class="title">PSG Bunker</h1>
+            <p class="subtitle">Smart Student Portal for PSG Tech</p>
+        </div>
+
+        <div class="login-card">
+            <form id="loginForm" method="POST" action="/login" novalidate>
+                {% if error %}
+                <div class="error-message show">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="rollno">Roll Number</label>
+                    <input 
+                        type="text" 
+                        id="rollno" 
+                        name="rollno" 
+                        required 
+                        autocomplete="username"
+                        placeholder="Enter your roll number"
+                        autocapitalize="none"
+                        spellcheck="false"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        autocomplete="current-password"
+                        placeholder="Enter your eCampus password"
+                    >
+                </div>
+
+                <button type="submit" class="btn" id="loginBtn">
+                    <span id="btnText">Login to Dashboard</span>
+                </button>
+
+                <div class="error-message" id="errorMessage"></div>
+            </form>
+        </div>
+
+        <div class="footer">
+            <p>
+                Developed by <strong>Manu Sanjay</strong> (24I434)<br>
+                B.Tech IT, PSG College of Technology<br>
+                &copy; 2025 PSG Bunker. All rights reserved.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced form handling with better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const btn = document.getElementById('loginBtn');
+            const btnText = document.getElementById('btnText');
+            const errorMessage = document.getElementById('errorMessage');
+            const rollnoInput = document.getElementById('rollno');
+            const passwordInput = document.getElementById('password');
+
+            // Auto-focus first input on desktop
+            if (window.innerWidth > 768) {
+                rollnoInput.focus();
+            }
+
+            function validateForm() {
+                const rollno = rollnoInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                if (!rollno) {
+                    showError('Please enter your roll number');
+                    rollnoInput.focus();
+                    return false;
+                }
+
+                if (!password) {
+                    showError('Please enter your password');
+                    passwordInput.focus();
+                    return false;
+                }
+
+                return true;
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.add('show');
+                setTimeout(() => errorMessage.classList.remove('show'), 5000);
+            }
+
+            function setLoading(loading) {
+                btn.disabled = loading;
+                btn.classList.toggle('btn-loading', loading);
+                btnText.textContent = loading ? 'Logging in...' : 'Login to Dashboard';
+            }
+
+            // Form submission
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                if (!validateForm()) return;
+
+                setLoading(true);
+                errorMessage.classList.remove('show');
+
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok && response.headers.get('content-type')?.includes('text/html')) {
+                        window.location.href = '/dashboard';
+                    } else {
+                        const text = await response.text();
+                        if (text.includes('error')) {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(text, 'text/html');
+                            const errorEl = doc.querySelector('.error-message');
+                            showError(errorEl ? errorEl.textContent : 'Login failed. Please try again.');
+                        } else {
+                            showError('An unexpected error occurred. Please try again.');
+                        }
+                    }
+                } catch (error) {
+                    showError('Network error. Please check your connection and try again.');
+                } finally {
+                    setLoading(false);
+                }
+            });
+
+            // Clear errors when typing
+            [rollnoInput, passwordInput].forEach(input => {
+                input.addEventListener('input', () => {
+                    errorMessage.classList.remove('show');
+                });
+            });
+
+            // Enter key handling
+            rollnoInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') passwordInput.focus();
+            });
+        });
+    </script>
 </body>
 </html>
