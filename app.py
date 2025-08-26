@@ -1,8 +1,7 @@
-
 import os
 import math
-from flask import Flask, render_template, request, jsonify, session as flask_session, send_from_directory
-from bunker_mod import return_attendance, data_json, return_cgpa, get_timetable_data
+from flask import Flask, render_template, request, jsonify, session as flask_session, send_from_directory, redirect
+from bunker_mod import return_attendance, data_json, return_cgpa, get_course_plan
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'psg-bunker-secret-key-change-in-production')
@@ -36,28 +35,31 @@ def login():
             return render_template("index.html", error=result)
 
     attendance_raw, session = result
-    attendance_data = data_json(attendance_raw)
+
+    # Get real course plan data from courseplan URL
+    course_plan = get_course_plan(session)
+
+    # Process attendance data with real course names from courseplan
+    attendance_data = data_json(attendance_raw, course_plan)
     cgpa_data = return_cgpa(session)
-    timetable_data = get_timetable_data()
 
     # Store data in Flask session for API endpoints
     flask_session['attendance_data'] = attendance_data
     flask_session['cgpa_data'] = cgpa_data
-    flask_session['timetable_data'] = timetable_data
+    flask_session['course_plan'] = course_plan
     flask_session['rollno'] = rollno
 
     if request.is_json:
         return jsonify({"ok": True})
     else:
         return render_template("dashboard.html",
-                             rollno=rollno,
-                             attendance=attendance_data,
-                             cgpa=cgpa_data,
-                             timetable=timetable_data)
+                               rollno=rollno,
+                               attendance=attendance_data,
+                               cgpa=cgpa_data)
 
 @app.route('/attendance')
 def get_attendance():
-    """API endpoint for attendance data"""
+    """API endpoint for attendance data with enhanced subject status"""
     attendance_data = flask_session.get('attendance_data', [])
 
     if not attendance_data:
@@ -91,33 +93,6 @@ def get_cgpa():
     cgpa_data = flask_session.get('cgpa_data', {})
     return jsonify(cgpa_data)
 
-@app.route('/timetable')
-def get_timetable():
-    """API endpoint for timetable data"""
-    timetable_data = flask_session.get('timetable_data', {})
-    attendance_data = flask_session.get('attendance_data', [])
-
-    # Create attendance lookup for color coding
-    attendance_lookup = {}
-    for subject in attendance_data:
-        attendance_lookup[subject['name']] = subject['percentage_of_attendance']
-
-    # Add attendance percentage to timetable data
-    for day in timetable_data:
-        for slot in timetable_data[day]:
-            subject_name = slot['subject']
-            slot['attendance_percentage'] = attendance_lookup.get(subject_name, 100)
-
-            # Add color class based on attendance
-            if slot['attendance_percentage'] < 75:
-                slot['color_class'] = 'danger'
-            elif slot['attendance_percentage'] < 85:
-                slot['color_class'] = 'warning'  
-            else:
-                slot['color_class'] = 'success'
-
-    return jsonify(timetable_data)
-
 @app.route('/dashboard')
 def dashboard():
     """Dashboard page route"""
@@ -125,30 +100,13 @@ def dashboard():
         return redirect('/')
 
     return render_template("dashboard.html",
-                         rollno=flask_session['rollno'],
-                         attendance=flask_session.get('attendance_data', []),
-                         cgpa=flask_session.get('cgpa_data', {}),
-                         timetable=flask_session.get('timetable_data', {}))
-
-@app.route('/robots.txt')
-def robots():
-    return send_from_directory(app.static_folder, 'robots.txt')
-
-@app.route('/sitemap.xml')
-def sitemap():
-    return send_from_directory(app.static_folder, 'sitemap.xml')
+                           rollno=flask_session['rollno'],
+                           attendance=flask_session.get('attendance_data', []),
+                           cgpa=flask_session.get('cgpa_data', {}))
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(app.static_folder, 'favicon.ico')
-
-@app.route('/logo.ico')
-def logo():
-    return send_from_directory(app.static_folder, 'favicon.ico')
-
-@app.route("/calendar")
-def calendar_page():
-    return render_template("calendar.html")
+    return send_from_directory('static', 'favicon.ico')
 
 # Error handlers
 @app.errorhandler(404)
