@@ -4,849 +4,137 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - PSG Bunker</title>
-    <meta name="description" content="PSG Bunker Dashboard - View your attendance, CGPA, and timetable with smart bunk calculator">
-    <meta name="robots" content="noindex, nofollow">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --primary-color: #6366f1;
-            --primary-light: #818cf8;
-            --primary-dark: #4f46e5;
-            --success-color: #10b981;
-            --success-light: #34d399;
-            --danger-color: #ef4444;
-            --danger-light: #f87171;
-            --warning-color: #f59e0b;
-            --warning-light: #fbbf24;
-
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --bg-card: #1e293b;
-
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-
-            --border-color: #334155;
-            --border-light: #475569;
-
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
-
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a202c 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-
-        /* Header */
-        .header {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            text-align: center;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .header p {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-
-        /* Navigation */
-        .nav-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            background: rgba(30, 41, 59, 0.5);
-            padding: 0.5rem;
-            border-radius: var(--radius-xl);
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-tab {
-            flex: 1;
-            padding: 0.875rem 1rem;
-            background: transparent;
-            border: none;
-            border-radius: var(--radius-lg);
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .nav-tab.active {
-            background: var(--primary-color);
-            color: white;
-            box-shadow: var(--shadow-md);
-        }
-
-        .nav-tab:hover:not(.active) {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-
-        /* Tab Content */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Cards */
-        .card {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .card h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
-            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-        }
-
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-value.danger { color: var(--danger-color); }
-        .stat-value.warning { color: var(--warning-color); }
-        .stat-value.success { color: var(--success-color); }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        /* Big Action Numbers */
-        .action-card {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: 2rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .action-card.can-bunk {
-            border-color: var(--success-color);
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .action-card.can-bunk::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--success-color);
-        }
-
-        .action-card.must-attend {
-            border-color: var(--danger-color);
-            background: rgba(239, 68, 68, 0.1);
-        }
-
-        .action-card.must-attend::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--danger-color);
-        }
-
-        .action-number {
-            font-size: 4rem;
-            font-weight: 900;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .action-number.bunk { color: var(--success-color); }
-        .action-number.attend { color: var(--danger-color); }
-
-        .action-text {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .action-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        /* Subject Cards */
-        .subjects-grid {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .subject-card {
-            background: rgba(51, 65, 85, 0.5);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .subject-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--primary-color);
-        }
-
-        .subject-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-        }
-
-        .subject-card.danger::before { background: var(--danger-color); }
-        .subject-card.warning::before { background: var(--warning-color); }
-        .subject-card.success::before { background: var(--success-color); }
-
-        .subject-header {
-            display: flex;
-            justify-content: between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .subject-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .subject-type {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: var(--radius-sm);
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .subject-type.theory {
-            background: rgba(99, 102, 241, 0.2);
-            color: var(--primary-light);
-        }
-
-        .subject-type.lab {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning-light);
-        }
-
-        .subject-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .subject-stat {
-            text-align: center;
-        }
-
-        .subject-stat-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .subject-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .attendance-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--bg-tertiary);
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            margin-bottom: 0.75rem;
-        }
-
-        .attendance-fill {
-            height: 100%;
-            border-radius: var(--radius-sm);
-            transition: width 0.3s ease;
-        }
-
-        .attendance-fill.danger { background: var(--danger-color); }
-        .attendance-fill.warning { background: var(--warning-color); }
-        .attendance-fill.success { background: var(--success-color); }
-
-        .subject-action {
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-align: center;
-            padding: 0.5rem;
-            border-radius: var(--radius-md);
-        }
-
-        .subject-action.bunk {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success-light);
-        }
-
-        .subject-action.attend {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger-light);
-        }
-
-        /* Timetable */
-        .timetable-container {
-            overflow-x: auto;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .timetable {
-            width: 100%;
-            min-width: 800px;
-            border-collapse: collapse;
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(20px);
-        }
-
-        .timetable th {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            padding: 1rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .timetable td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            vertical-align: top;
-        }
-
-        .time-slot {
-            min-width: 100px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-align: center;
-            background: rgba(51, 65, 85, 0.3);
-        }
-
-        .timetable-cell {
-            min-height: 60px;
-            border-radius: var(--radius-sm);
-            margin: 2px;
-            padding: 0.5rem;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .timetable-cell:hover {
-            transform: scale(1.02);
-            box-shadow: var(--shadow-md);
-        }
-
-        .timetable-cell.danger {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid var(--danger-color);
-        }
-
-        .timetable-cell.warning {
-            background: rgba(245, 158, 11, 0.2);
-            border: 1px solid var(--warning-color);
-        }
-
-        .timetable-cell.success {
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid var(--success-color);
-        }
-
-        .subject-name-table {
-            font-weight: 600;
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
-            color: var(--text-primary);
-        }
-
-        .class-type {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.25rem;
-        }
-
-        .room-info {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .attendance-percentage {
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-top: 0.25rem;
-        }
-
-        .timetable-legend {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: var(--radius-sm);
-        }
-
-        .legend-color.danger { background: var(--danger-color); }
-        .legend-color.warning { background: var(--warning-color); }
-        .legend-color.success { background: var(--success-color); }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .container { padding: 0.5rem; }
-            .header { padding: 1rem; }
-            .header h1 { font-size: 1.5rem; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .action-number { font-size: 3rem; }
-            .nav-tabs { flex-direction: column; }
-            .subject-stats { grid-template-columns: 1fr; }
-            .timetable-legend { flex-direction: column; align-items: center; }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>PSG Bunker Dashboard</h1>
-            <p>Welcome, {{ rollno }} | PSG College of Technology</p>
+        <h1>PSG Bunker Dashboard</h1>
+        <p class="text-center" style="color: #888; margin-bottom: 2rem;">
+            Welcome, {{ rollno }} | PSG College of Technology
+        </p>
+
+        <div class="nav-buttons">
+            <a href="/" class="nav-btn">🏠 Home</a>
+            <a href="#attendance" class="nav-btn">📊 Attendance</a>
         </div>
 
-        <!-- Navigation -->
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('attendance')">📊 Attendance</button>
-            <button class="nav-tab" onclick="showTab('cgpa')">🎓 CGPA</button>
-            <button class="nav-tab" onclick="showTab('timetable')">📅 Timetable</button>
+        <!-- Subject-wise Attendance with Enhanced Status Display -->
+        <h2 id="attendance">📚 Subject-wise Attendance</h2>
+        <div class="grid grid-2" id="subjects-container">
+            <!-- Subject cards will be populated by JavaScript with prominent status display -->
         </div>
 
-        <!-- Attendance Tab -->
-        <div id="attendance-tab" class="tab-content active">
-            <!-- Overall Action Card -->
-            <div id="action-card" class="action-card">
-                <div id="action-number" class="action-number">0</div>
-                <div id="action-text" class="action-text">Loading...</div>
-                <div class="action-subtitle">Based on 75% minimum requirement</div>
+        <!-- CGPA Section -->
+        <h2>🎓 Academic Performance</h2>
+        <div class="grid grid-3">
+            <div class="stat-card">
+                <span class="stat-number" id="total-cgpa">0.0</span>
+                <div class="stat-label">Total CGPA</div>
             </div>
-
-            <!-- Overall Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div id="overall-percentage" class="stat-value">0%</div>
-                    <div class="stat-label">Overall Attendance</div>
-                </div>
-                <div class="stat-card">
-                    <div id="total-present" class="stat-value">0</div>
-                    <div class="stat-label">Total Classes Attended</div>
-                </div>
-                <div class="stat-card">
-                    <div id="total-hours" class="stat-value">0</div>
-                    <div class="stat-label">Total Classes Conducted</div>
-                </div>
-                <div class="stat-card">
-                    <div id="subjects-below-75" class="stat-value danger">0</div>
-                    <div class="stat-label">Subjects Below 75%</div>
-                </div>
+            <div class="stat-card">
+                <span class="stat-number" id="latest-semester">-</span>
+                <div class="stat-label">Latest Semester</div>
             </div>
-
-            <!-- Subjects -->
-            <div class="card">
-                <h2>📚 Subject-wise Attendance</h2>
-                <div id="subjects-container" class="subjects-grid">
-                    <!-- Subject cards will be populated by JavaScript -->
-                </div>
+            <div class="stat-card">
+                <span class="stat-number" id="semesters-completed">0</span>
+                <div class="stat-label">Semesters Completed</div>
             </div>
         </div>
 
-        <!-- CGPA Tab -->
-        <div id="cgpa-tab" class="tab-content">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div id="total-cgpa" class="stat-value success">0.0</div>
-                    <div class="stat-label">Total CGPA</div>
-                </div>
-                <div class="stat-card">
-                    <div id="latest-semester" class="stat-value">-</div>
-                    <div class="stat-label">Latest Semester</div>
-                </div>
-                <div class="stat-card">
-                    <div id="total-semesters" class="stat-value">0</div>
-                    <div class="stat-label">Semesters Completed</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>🎓 Academic Performance</h2>
-                <p>Your cumulative CGPA across all semesters is displayed above. This includes all completed courses and their respective credit points.</p>
-            </div>
-        </div>
-
-        <!-- Timetable Tab -->
-        <div id="timetable-tab" class="tab-content">
-            <div class="card">
-                <h2>📅 Weekly Timetable</h2>
-                <p>Classes are color-coded based on attendance: Red (&lt;75%), Yellow (75-85%), Green (&gt;85%)</p>
-
-                <div class="timetable-container">
-                    <table class="timetable" id="timetable">
-                        <!-- Timetable will be populated by JavaScript -->
-                    </table>
-                </div>
-
-                <div class="timetable-legend">
-                    <div class="legend-item">
-                        <div class="legend-color danger"></div>
-                        <span>Below 75% - Attend Immediately</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color warning"></div>
-                        <span>75-85% - Be Careful</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color success"></div>
-                        <span>Above 85% - Safe to Bunk</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <footer>
+            <p>© 2025 PSG Bunker - Enhanced Subject Status</p>
+            <p>Developed by Manu Sanjay (24I434) | B.Tech IT, PSG College of Technology</p>
+        </footer>
     </div>
 
     <script>
-        let attendanceData = [];
-        let cgpaData = {};
-        let timetableData = {};
-
-        // Tab switching
-        function showTab(tabName) {
-            // Remove active class from all tabs and content
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            // Add active class to selected tab and content
-            event.target.classList.add('active');
-            document.getElementById(tabName + '-tab').classList.add('active');
-        }
-
-        // Load data when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadAttendanceData();
-            loadCGPAData();
-            loadTimetableData();
-        });
-
-        async function loadAttendanceData() {
-            try {
-                const response = await fetch('/attendance');
-                const data = await response.json();
-
+        // Load attendance data
+        fetch('/attendance')
+            .then(response => response.json())
+            .then(data => {
                 if (data.error) {
                     console.error('Error loading attendance:', data.error);
                     return;
                 }
 
-                attendanceData = data.subjects;
-                updateAttendanceUI(data);
-            } catch (error) {
-                console.error('Error fetching attendance:', error);
-            }
-        }
+                // Populate subject cards with prominent status display
+                const container = document.getElementById('subjects-container');
+                container.innerHTML = '';
 
-        function updateAttendanceUI(data) {
-            // Update overall stats
-            document.getElementById('overall-percentage').textContent = data.percentage.toFixed(1) + '%';
-            document.getElementById('total-present').textContent = data.attended_days;
-            document.getElementById('total-hours').textContent = data.total_days;
+                data.subjects.forEach(subject => {
+                    const colorClass = subject.percentage_of_attendance < 75 ? 'danger' : 
+                                     subject.percentage_of_attendance < 85 ? 'warning' : 'success';
 
-            // Count subjects below 75%
-            const subjectsBelow75 = data.subjects.filter(s => s.percentage_of_attendance < 75).length;
-            document.getElementById('subjects-below-75').textContent = subjectsBelow75;
+                    const card = document.createElement('div');
+                    card.className = `subject-card ${colorClass}`;
 
-            // Update action card
-            const actionCard = document.getElementById('action-card');
-            const actionNumber = document.getElementById('action-number');
-            const actionText = document.getElementById('action-text');
+                    // Use full course name
+                    const courseName = subject.full_course_name || subject.name;
 
-            if (data.percentage < 75) {
-                actionCard.className = 'action-card must-attend';
-                actionNumber.className = 'action-number attend';
-                actionNumber.textContent = data.need_days;
-                actionText.textContent = 'Classes Must Attend';
-            } else {
-                actionCard.className = 'action-card can-bunk';
-                actionNumber.className = 'action-number bunk';
-                actionNumber.textContent = data.bunkable_days;
-                actionText.textContent = 'Classes Can Bunk';
-            }
+                    // Determine status message and styling
+                    let statusMessage = '';
+                    let statusClass = '';
+                    let statusNumber = '';
 
-            // Update overall percentage color
-            const percentageElement = document.getElementById('overall-percentage');
-            if (data.percentage < 75) {
-                percentageElement.className = 'stat-value danger';
-            } else if (data.percentage < 85) {
-                percentageElement.className = 'stat-value warning';
-            } else {
-                percentageElement.className = 'stat-value success';
-            }
+                    if (subject.status === 'must_attend') {
+                        statusMessage = 'Must Attend';
+                        statusClass = 'status-must-attend';
+                        statusNumber = subject.classes_to_attend;
+                    } else {
+                        statusMessage = 'Can Miss';
+                        statusClass = 'status-can-miss';
+                        statusNumber = subject.classes_to_bunk;
+                    }
 
-            // Populate subjects
-            populateSubjects(data.subjects);
-        }
-
-        function populateSubjects(subjects) {
-            const container = document.getElementById('subjects-container');
-            container.innerHTML = '';
-
-            subjects.forEach(subject => {
-                const card = document.createElement('div');
-
-                let colorClass = 'success';
-                if (subject.percentage_of_attendance < 75) colorClass = 'danger';
-                else if (subject.percentage_of_attendance < 85) colorClass = 'warning';
-
-                card.className = `subject-card ${colorClass}`;
-
-                const actionText = subject.status === 'can_bunk' 
-                    ? `Can bunk ${subject.classes_to_bunk} classes`
-                    : `Must attend ${subject.classes_to_attend} classes`;
-
-                const actionClass = subject.status === 'can_bunk' ? 'bunk' : 'attend';
-
-                card.innerHTML = `
-                    <div class="subject-header">
-                        <div>
-                            <div class="subject-name">${subject.name}</div>
-                            <span class="subject-type ${subject.type}">${subject.type}</span>
+                    card.innerHTML = `
+                        <div class="subject-title">${courseName}</div>
+                        <div class="subject-main-info">
+                            <div class="attendance-percentage">
+                                <span class="percentage-number ${colorClass}">${subject.percentage_of_attendance.toFixed(1)}%</span>
+                                <div class="attendance-details">${subject.total_present}/${subject.total_hours} attended</div>
+                            </div>
+                            <div class="status-display">
+                                <div class="status-number ${statusClass}">${statusNumber}</div>
+                                <div class="status-label ${statusClass}">${statusMessage}</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="subject-stats">
-                        <div class="subject-stat">
-                            <div class="subject-stat-value">${subject.total_present}/${subject.total_hours}</div>
-                            <div class="subject-stat-label">Present/Total</div>
+                        <div class="subject-footer">
+                            <div class="subject-type">Type: ${subject.type}</div>
+                            <div class="subject-period">Period: ${subject.attendance_from} to ${subject.attendance_to}</div>
+                            ${subject.original_name ? `<div class="course-code">Code: ${subject.original_name}</div>` : ''}
                         </div>
-                        <div class="subject-stat">
-                            <div class="subject-stat-value">${subject.percentage_of_attendance.toFixed(1)}%</div>
-                            <div class="subject-stat-label">Attendance</div>
-                        </div>
-                    </div>
-                    <div class="attendance-bar">
-                        <div class="attendance-fill ${colorClass}" style="width: ${subject.percentage_of_attendance}%"></div>
-                    </div>
-                    <div class="subject-action ${actionClass}">${actionText}</div>
-                `;
+                    `;
+                    container.appendChild(card);
+                });
+            })
+            .catch(error => console.error('Error:', error));
 
-                container.appendChild(card);
-            });
-        }
-
-        async function loadCGPAData() {
-            try {
-                const response = await fetch('/cgpa');
-                const data = await response.json();
-
+        // Load CGPA data
+        fetch('/cgpa')
+            .then(response => response.json())
+            .then(data => {
                 if (data.error) {
                     console.error('Error loading CGPA:', data.error);
                     return;
                 }
 
-                cgpaData = data;
-                updateCGPAUI(data);
-            } catch (error) {
-                console.error('Error fetching CGPA:', error);
-            }
-        }
+                document.getElementById('total-cgpa').textContent = data.total_cgpa || '0.0';
+                document.getElementById('latest-semester').textContent = data.latest_sem || '-';
+                document.getElementById('semesters-completed').textContent = data.total_semesters || '0';
+            })
+            .catch(error => console.error('Error:', error));
 
-        function updateCGPAUI(data) {
-            document.getElementById('total-cgpa').textContent = data.total_cgpa || '0.0';
-            document.getElementById('latest-semester').textContent = data.latest_sem || '-';
-            document.getElementById('total-semesters').textContent = data.total_semesters || '0';
-        }
-
-        async function loadTimetableData() {
-            try {
-                const response = await fetch('/timetable');
-                const data = await response.json();
-
-                timetableData = data;
-                updateTimetableUI(data);
-            } catch (error) {
-                console.error('Error fetching timetable:', error);
-            }
-        }
-
-        function updateTimetableUI(data) {
-            const table = document.getElementById('timetable');
-            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-            const timeSlots = ['9:00-10:00', '10:15-11:15', '11:30-12:30', '1:30-2:30', '2:45-3:45'];
-
-            // Create header
-            let headerHTML = '<thead><tr><th>Time</th>';
-            days.forEach(day => {
-                headerHTML += `<th>${day}</th>`;
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
             });
-            headerHTML += '</tr></thead>';
-
-            // Create body
-            let bodyHTML = '<tbody>';
-            timeSlots.forEach(timeSlot => {
-                bodyHTML += `<tr><td class="time-slot">${timeSlot}</td>`;
-
-                days.forEach(day => {
-                    const daySchedule = data[day] || [];
-                    const classAtTime = daySchedule.find(c => c.time === timeSlot);
-
-                    if (classAtTime) {
-                        bodyHTML += `
-                            <td>
-                                <div class="timetable-cell ${classAtTime.color_class}">
-                                    <div class="subject-name-table">${classAtTime.subject}</div>
-                                    <div class="class-type">${classAtTime.type}</div>
-                                    <div class="room-info">${classAtTime.room}</div>
-                                    <div class="attendance-percentage">${classAtTime.attendance_percentage.toFixed(1)}%</div>
-                                </div>
-                            </td>
-                        `;
-                    } else {
-                        bodyHTML += '<td></td>';
-                    }
-                });
-
-                bodyHTML += '</tr>';
-            });
-            bodyHTML += '</tbody>';
-
-            table.innerHTML = headerHTML + bodyHTML;
-        }
+        });
     </script>
 </body>
 </html>
