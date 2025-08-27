@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PSG Bunker - Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
     <div class="container">
         <div class="login-container">
             <div class="login-header">
-                <div class="logo">🎓</div>
+                <div class="logo">
+                    🎓
+                </div>
                 <h1>PSG Bunker</h1>
                 <p>Attendance & CGPA Tracker for PSG Tech</p>
             </div>
@@ -22,42 +23,33 @@
             </div>
             {% endif %}
 
-            <form method="POST" action="/login" id="loginForm">
+            <form method="POST" action="/login">
                 <div class="form-group">
                     <label for="rollno">Roll Number:</label>
-                    <input type="text" id="rollno" name="rollno" required 
-                           placeholder="Enter your roll number" autocomplete="username">
+                    <input type="text" id="rollno" name="rollno" required>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required 
-                           placeholder="Enter your password" autocomplete="current-password">
+                    <input type="password" id="password" name="password" required>
                 </div>
 
                 <button type="submit" class="w-100">
-                    <span id="loginText">Login to PSG eCampus</span>
-                    <span id="loadingText" class="hidden">
-                        <span class="loading"></span> Logging in...
-                    </span>
+                    Login to Dashboard
                 </button>
             </form>
         </div>
 
-        <footer>
-            <p>Manu Sanjay BTech IT PSG TECH</p>
-            <p>© 2025 PSG College of Technology</p>
-        </footer>
+        <!-- Developer Credit and Instagram Link at Bottom -->
+        <div style="text-align: center; margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #333; color: #888;">
+            <div style="margin-bottom: 0.5rem; font-size: 0.9rem;">
+                Website developed by Manu Sanjay Btech-IT PSG TECH
+            </div>
+            <a href="https://www.instagram.com/manu_sanjay.m" target="_blank" style="color: #4a9eff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                <img src="https://img.icons8.com/?size=100&id=BrU2BBoRXiWq&format=png&color=4a9eff" alt="Instagram" style="width: 20px; height: 20px;">
+                @manu_sanjay.m
+            </a>
+        </div>
     </div>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const loginText = document.getElementById('loginText');
-            const loadingText = document.getElementById('loadingText');
-
-            loginText.classList.add('hidden');
-            loadingText.classList.remove('hidden');
-        });
-    </script>
 </body>
 </html>
