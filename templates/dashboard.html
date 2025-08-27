@@ -80,31 +80,10 @@
 
             let html = '';
 
-            // Overall stats
-            html += `
-                <div class="grid grid-4" style="margin-bottom: 2rem;">
-                    <div class="stat-card">
-                        <span class="stat-number">${data.total_days}</span>
-                        <div class="stat-label">Total Classes</div>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number">${data.attended_days}</span>
-                        <div class="stat-label">Attended</div>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number ${getPercentageClass(data.percentage)}">${data.percentage.toFixed(1)}%</span>
-                        <div class="stat-label">Overall %</div>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number ${data.need_days > 0 ? 'danger' : 'success'}">
-                            ${data.need_days > 0 ? data.need_days : data.bunkable_days}
-                        </span>
-                        <div class="stat-label">${data.need_days > 0 ? 'Must Attend' : 'Can Miss'}</div>
-                    </div>
-                </div>
-            `;
+            // REMOVED: Overall stats section (Total Classes, Attended, Overall %, Must Attend/Can Miss)
+            // Now directly showing individual subject cards
 
-            // Subject cards (removed subject type display)
+            // Subject cards (without subject type display)
             data.subjects.forEach(subject => {
                 const statusClass = subject.percentage_of_attendance >= 75 ? 'success' : 'danger';
                 const percentageClass = getPercentageClass(subject.percentage_of_attendance);
