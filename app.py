@@ -36,7 +36,7 @@ def login():
 
     attendance_raw, session = result
 
-    # Get real course plan data from courseplan URL
+    # Get real course plan data with course titles
     course_plan = get_course_plan(session)
 
     # Process attendance data with real course names from courseplan
@@ -53,13 +53,13 @@ def login():
         return jsonify({"ok": True})
     else:
         return render_template("dashboard.html",
-                               rollno=rollno,
-                               attendance=attendance_data,
-                               cgpa=cgpa_data)
+                             rollno=rollno,
+                             attendance=attendance_data,
+                             cgpa=cgpa_data)
 
 @app.route('/attendance')
 def get_attendance():
-    """API endpoint for attendance data with enhanced subject status"""
+    """API endpoint for attendance data with course titles"""
     attendance_data = flask_session.get('attendance_data', [])
 
     if not attendance_data:
@@ -78,8 +78,15 @@ def get_attendance():
         need_days = 0
         bunkable_days = int((total_present - 0.75 * total_hours) / 0.75)
 
+    # Include course titles in response
+    subjects_with_titles = []
+    for subject in attendance_data:
+        subject_with_title = subject.copy()
+        subject_with_title['display_name'] = subject.get('course_title', subject.get('name', subject.get('original_name', 'Unknown Course')))
+        subjects_with_titles.append(subject_with_title)
+
     return jsonify({
-        "subjects": attendance_data,
+        "subjects": subjects_with_titles,
         "total_days": total_hours,
         "attended_days": total_present,
         "percentage": overall_percentage,
@@ -93,16 +100,22 @@ def get_cgpa():
     cgpa_data = flask_session.get('cgpa_data', {})
     return jsonify(cgpa_data)
 
+@app.route('/courses')
+def get_courses():
+    """API endpoint to get course mapping"""
+    course_plan = flask_session.get('course_plan', {})
+    return jsonify(course_plan)
+
 @app.route('/dashboard')
 def dashboard():
-    """Dashboard page route"""
+    """Dashboard page route with course titles"""
     if 'rollno' not in flask_session:
         return redirect('/')
 
     return render_template("dashboard.html",
-                           rollno=flask_session['rollno'],
-                           attendance=flask_session.get('attendance_data', []),
-                           cgpa=flask_session.get('cgpa_data', {}))
+                         rollno=flask_session['rollno'],
+                         attendance=flask_session.get('attendance_data', []),
+                         cgpa=flask_session.get('cgpa_data', {}))
 
 @app.route('/favicon.ico')
 def favicon():
