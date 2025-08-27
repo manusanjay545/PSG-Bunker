@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PSG Bunker - Student Portal</title>
+    <title>PSG Bunker - Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
     <div class="container">
         <div class="login-container">
             <div class="login-header">
-                <div class="logo">B</div>
+                <div class="logo">🎓</div>
                 <h1>PSG Bunker</h1>
-                <p style="color: #888; margin-bottom: 2rem;">Enhanced Subject Status Display</p>
+                <p>Attendance & CGPA Tracker for PSG Tech</p>
             </div>
 
             {% if error %}
@@ -22,43 +22,41 @@
             </div>
             {% endif %}
 
-            <form method="POST" action="/login">
+            <form method="POST" action="/login" id="loginForm">
                 <div class="form-group">
-                    <label for="rollno">Roll Number</label>
-                    <input type="text" id="rollno" name="rollno" required>
+                    <label for="rollno">Roll Number:</label>
+                    <input type="text" id="rollno" name="rollno" required 
+                           placeholder="Enter your roll number" autocomplete="username">
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Enter your password" autocomplete="current-password">
                 </div>
 
-                <button type="submit" class="w-100">Login</button>
+                <button type="submit" class="w-100">
+                    <span id="loginText">Login to PSG eCampus</span>
+                    <span id="loadingText" class="hidden">
+                        <span class="loading"></span> Logging in...
+                    </span>
+                </button>
             </form>
-
-            <footer>
-                <p>© 2025 PSG Bunker</p>
-                <p>Developed by Manu Sanjay (24I434)</p>
-            </footer>
         </div>
+
+        <footer>
+            <p>Manu Sanjay BTech IT PSG TECH</p>
+            <p>© 2025 PSG College of Technology</p>
+        </footer>
     </div>
 
     <script>
-        document.getElementById('rollno').focus();
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const loginText = document.getElementById('loginText');
+            const loadingText = document.getElementById('loadingText');
 
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const rollno = document.getElementById('rollno').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            if (!rollno || !password) {
-                e.preventDefault();
-                alert('Please enter both roll number and password');
-                return false;
-            }
-
-            const btn = document.querySelector('button');
-            btn.textContent = 'Logging in...';
-            btn.disabled = true;
+            loginText.classList.add('hidden');
+            loadingText.classList.remove('hidden');
         });
     </script>
 </body>
