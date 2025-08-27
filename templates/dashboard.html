@@ -5,186 +5,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - PSG Bunker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
     <div class="container">
         <h1>📚 PSG Bunker Dashboard</h1>
 
-        <div class="alert alert-success">
-            Welcome, {{ rollno }} | PSG College of Technology
+        <div class="card">
+            <div class="card-header">Welcome, {{ rollno }} | PSG College of Technology</div>
         </div>
 
-        <div id="attendance">
-            <h2>📚 Subject-wise Attendance</h2>
-
-            <div id="attendance-grid" class="grid">
-                <!-- Attendance cards will be populated by JavaScript -->
+        <!-- CGPA Section moved to top -->
+        <h2>🎓 Academic Performance</h2>
+        <div class="grid grid-3">
+            <div class="stat-card">
+                <span class="stat-number">{{ cgpa.total_cgpa or '0.0' }}</span>
+                <div class="stat-label">Total CGPA</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ cgpa.latest_sem or '-' }}</span>
+                <div class="stat-label">Latest Semester</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ cgpa.total_semesters or '0' }}</span>
+                <div class="stat-label">Semesters Completed</div>
             </div>
         </div>
 
-        <div id="cgpa-section">
-            <h2>🎓 Academic Performance</h2>
-
-            <div class="grid grid-3">
-                <div class="stat-card">
-                    <span class="stat-number" id="cgpa-value">{{ cgpa.total_cgpa or '0.0' }}</span>
-                    <span class="stat-label">Total CGPA</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="latest-sem">{{ cgpa.latest_sem or '-' }}</span>
-                    <span class="stat-label">Latest Semester</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="total-sems">{{ cgpa.total_semesters or '0' }}</span>
-                    <span class="stat-label">Semesters Completed</span>
-                </div>
-            </div>
+        <!-- Subject-wise Attendance Section -->
+        <h2>📚 Subject-wise Attendance</h2>
+        <div id="attendanceContainer">
+            <div class="loading"></div>
+            <p>Loading attendance data...</p>
         </div>
 
-        <div class="share-section text-center mt-3">
-            <button onclick="shareWebsite()" class="share-btn">
-                🔗 Share PSG Bunker
+        <!-- Share Section -->
+        <div class="share-section text-center">
+            <button class="share-btn" onclick="shareApp()">
+                📤 Share PSG Bunker
             </button>
         </div>
 
-        <footer>
-            <p>Manu Sanjay BTech IT PSG TECH</p>
-            <p>© 2025 PSG College of Technology</p>
-        </footer>
+        <!-- Developer Credit and Instagram Link at Bottom -->
+        <div style="text-align: center; margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #333; color: #888;">
+            <div style="margin-bottom: 0.5rem; font-size: 0.9rem;">
+                Website developed by Manu Sanjay Btech-IT PSG TECH
+            </div>
+            <a href="https://www.instagram.com/manu_sanjay.m" target="_blank" style="color: #4a9eff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                <img src="https://img.icons8.com/?size=100&id=BrU2BBoRXiWq&format=png&color=4a9eff" alt="Instagram" style="width: 20px; height: 20px;">
+                @manu_sanjay.m
+            </a>
+        </div>
     </div>
 
     <script>
-        // Function to share the website
-        function shareWebsite() {
-            const url = 'https://psgbunker.in.net';
-            const title = 'PSG Bunker - Attendance & CGPA Tracker';
-            const text = 'Check out PSG Bunker for tracking your attendance and CGPA at PSG Tech!';
+        // Load attendance data
+        fetch('/attendance')
+            .then(response => response.json())
+            .then(data => {
+                displayAttendance(data);
+            })
+            .catch(error => {
+                console.error('Error loading attendance:', error);
+                document.getElementById('attendanceContainer').innerHTML = 
+                    '<div class="alert alert-danger">Error loading attendance data</div>';
+            });
 
-            if (navigator.share) {
-                navigator.share({
-                    title: title,
-                    text: text,
-                    url: url
-                }).catch(console.error);
-            } else {
-                // Fallback for browsers that don't support Web Share API
-                const shareText = `${title}\n${text}\n${url}`;
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText(shareText).then(() => {
-                        alert('Website link copied to clipboard!');
-                    });
-                } else {
-                    // Final fallback
-                    const textArea = document.createElement('textarea');
-                    textArea.value = shareText;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    alert('Website link copied to clipboard!');
-                }
+        function displayAttendance(data) {
+            const container = document.getElementById('attendanceContainer');
+
+            if (data.error) {
+                container.innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+                return;
             }
-        }
 
-        async function loadAttendance() {
-            try {
-                const response = await fetch('/attendance');
-                const data = await response.json();
+            let html = '';
 
-                if (data.error) {
-                    document.getElementById('attendance-grid').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
-                    return;
-                }
+            // Overall stats
+            html += `
+                <div class="grid grid-4" style="margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <span class="stat-number">${data.total_days}</span>
+                        <div class="stat-label">Total Classes</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${data.attended_days}</span>
+                        <div class="stat-label">Attended</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number ${getPercentageClass(data.percentage)}">${data.percentage.toFixed(1)}%</span>
+                        <div class="stat-label">Overall %</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number ${data.need_days > 0 ? 'danger' : 'success'}">
+                            ${data.need_days > 0 ? data.need_days : data.bunkable_days}
+                        </span>
+                        <div class="stat-label">${data.need_days > 0 ? 'Must Attend' : 'Can Miss'}</div>
+                    </div>
+                </div>
+            `;
 
-                const grid = document.getElementById('attendance-grid');
-                grid.innerHTML = '';
+            // Subject cards (removed subject type display)
+            data.subjects.forEach(subject => {
+                const statusClass = subject.percentage_of_attendance >= 75 ? 'success' : 'danger';
+                const percentageClass = getPercentageClass(subject.percentage_of_attendance);
 
-                // Create subject cards with course titles
-                data.subjects.forEach(subject => {
-                    const card = document.createElement('div');
-
-                    // Determine card style based on attendance
-                    const percentage = subject.percentage_of_attendance;
-                    let cardClass = 'subject-card ';
-                    let percentageClass = '';
-                    let statusClass = '';
-
-                    if (percentage >= 85) {
-                        cardClass += 'success';
-                        percentageClass = 'success';
-                        statusClass = 'status-can-miss';
-                    } else if (percentage >= 75) {
-                        cardClass += 'warning';
-                        percentageClass = 'warning';
-                        statusClass = 'status-can-miss';
-                    } else {
-                        cardClass += 'danger';
-                        percentageClass = 'danger';
-                        statusClass = 'status-must-attend';
-                    }
-
-                    // Card with course title prominently displayed
-                    card.className = cardClass;
-                    card.innerHTML = `
-                        <div class="subject-title">
-                            ${subject.course_title || subject.name}
-                        </div>
+                html += `
+                    <div class="subject-card ${statusClass}">
+                        <div class="subject-title">${subject.display_name || subject.name}</div>
 
                         <div class="subject-main-info">
                             <div class="attendance-percentage">
-                                <span class="percentage-number ${percentageClass}">${percentage.toFixed(1)}%</span>
+                                <span class="percentage-number ${percentageClass}">${subject.percentage_of_attendance.toFixed(1)}%</span>
                                 <div class="attendance-details">
                                     ${subject.total_present}/${subject.total_hours} classes attended
                                 </div>
                             </div>
 
                             <div class="status-display">
-                                ${subject.status === 'can_bunk' ? 
-                                    `<span class="status-number ${statusClass}">${subject.classes_to_bunk}</span>
-                                     <div class="status-label ${statusClass}">Can Miss</div>` :
-                                    `<span class="status-number ${statusClass}">${subject.classes_to_attend}</span>
-                                     <div class="status-label ${statusClass}">Must Attend</div>`
-                                }
+                                <span class="status-number ${subject.classes_to_attend > 0 ? 'status-must-attend' : 'status-can-miss'}">
+                                    ${subject.classes_to_attend > 0 ? subject.classes_to_attend : subject.classes_to_bunk}
+                                </span>
+                                <div class="status-label ${subject.classes_to_attend > 0 ? 'status-must-attend' : 'status-can-miss'}">
+                                    ${subject.classes_to_attend > 0 ? 'Must Attend' : 'Can Miss'}
+                                </div>
                             </div>
                         </div>
 
                         <div class="subject-footer">
-                            <div class="course-code">Course Code: ${subject.course_code || subject.original_name}</div>
-                            <div class="subject-type">Type: ${subject.type}</div>
-                            <div>Period: ${subject.attendance_from} to ${subject.attendance_to}</div>
+                            <div><strong>Period:</strong> ${subject.attendance_from} to ${subject.attendance_to}</div>
+                            <div><strong>Total Hours:</strong> ${subject.total_hours} | <strong>Exception:</strong> ${subject.exception_hour}</div>
                         </div>
-                    `;
+                    </div>
+                `;
+            });
 
-                    grid.appendChild(card);
+            container.innerHTML = html;
+        }
+
+        function getPercentageClass(percentage) {
+            if (percentage >= 85) return 'success';
+            if (percentage >= 75) return 'warning';
+            return 'danger';
+        }
+
+        function shareApp() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'PSG Bunker - Attendance Tracker',
+                    text: 'Check out PSG Bunker - Easy attendance and CGPA tracking for PSG Tech students!',
+                    url: window.location.origin
                 });
-
-            } catch (error) {
-                console.error('Error loading attendance:', error);
-                document.getElementById('attendance-grid').innerHTML = '<div class="alert alert-danger">Error loading attendance data</div>';
-            }
-        }
-
-        async function loadCGPA() {
-            try {
-                const response = await fetch('/cgpa');
-                const data = await response.json();
-
-                if (!data.error) {
-                    document.getElementById('cgpa-value').textContent = data.total_cgpa || '0.0';
-                    document.getElementById('latest-sem').textContent = data.latest_sem || '-';
-                    document.getElementById('total-sems').textContent = data.total_semesters || '0';
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                const url = window.location.origin;
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert('App link copied to clipboard!');
+                    });
+                } else {
+                    alert(`Share this link: ${url}`);
                 }
-            } catch (error) {
-                console.error('Error loading CGPA:', error);
             }
         }
-
-        // Load data when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadAttendance();
-            loadCGPA();
-        });
     </script>
 </body>
 </html>
