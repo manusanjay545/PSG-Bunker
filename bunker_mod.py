@@ -12,6 +12,14 @@ def gradeMap(grade):
     }
     return grade_map.get(grade.strip().upper(), 0)
 
+class TimeTableModel:
+    """Model for storing course information with titles"""
+    def __init__(self, course_code, course_title, programme="", sem_no=""):
+        self.course_code = course_code
+        self.course_title = course_title
+        self.programme = programme
+        self.sem_no = sem_no
+
 def return_attendance(username, pwd):
     try:
         session = requests.Session()
@@ -58,74 +66,95 @@ def return_attendance(username, pwd):
     except Exception as e:
         return f"Error: {str(e)}"
 
-def get_course_plan(session):
-    """Fetch real course details from courseplan page with enhanced parsing"""
+def fetch_time_table(session):
+    """Fetch course titles from timetable page"""
     try:
+        time_table_url = "https://ecampus.psgtech.ac.in/studzone2/AttWfStudTimtab.aspx"
+        page = session.get(time_table_url)
+        soup = BeautifulSoup(page.text, 'html.parser')
+
+        table = soup.find("table", attrs={"id": "TbCourDesc"})
+        if table is None:
+            return {}
+
+        data = []
+        rows = table.find_all("tr")
+        for index, row in enumerate(rows):
+            cols = row.find_all("td")
+            cols = [ele.text.strip() for ele in cols]
+            data.append([ele for ele in cols if ele])
+
+        # Create course code to title mapping
+        course_map = {}
+        for i in range(1, len(data)):
+            if len(data[i]) >= 2:
+                course_code = data[i][0]
+                course_title = data[i][1]
+                course_map[course_code] = course_title
+
+        return course_map
+
+    except Exception as e:
+        print(f"Error fetching timetable: {e}")
+        return {}
+
+def get_course_plan(session):
+    """Course plan fetching with multiple strategies"""
+    try:
+        # Strategy 1: Try the courseplan URL
         courseplan_url = "https://ecampus.psgtech.ac.in/studzone/Attendance/courseplan"
         page = session.get(courseplan_url)
         soup = BeautifulSoup(page.text, 'html.parser')
 
         courses = {}
-
-        # Parse course data from the page - try multiple table structures
         tables = soup.find_all("table")
 
         for table in tables:
             rows = table.find_all("tr")
-
-            # Skip if table has less than 2 rows (header + data)
             if len(rows) < 2:
                 continue
 
             for i, row in enumerate(rows):
-                # Skip header rows
-                if i == 0:
+                if i == 0:  # Skip header
                     continue
 
                 cols = row.find_all(["td", "th"])
-
                 if len(cols) >= 2:
-                    # Try different column arrangements
-                    # Format 1: Code | Name | Credits
-                    if len(cols) >= 3:
-                        course_code = cols[0].text.strip()
-                        course_name = cols[1].text.strip()
-                        credits = cols[2].text.strip() if len(cols) > 2 else ""
-                    # Format 2: Code | Name  
-                    else:
-                        course_code = cols[0].text.strip()
-                        course_name = cols[1].text.strip()
-                        credits = ""
+                    course_code = cols[0].text.strip()
+                    course_name = cols[1].text.strip()
 
-                    # Clean and validate data
                     if course_code and course_name and len(course_code) > 0 and len(course_name) > 2:
-                        # Remove extra whitespace and clean up
                         course_code = re.sub(r'\s+', ' ', course_code).strip()
                         course_name = re.sub(r'\s+', ' ', course_name).strip()
 
-                        # Store with multiple keys for better matching
                         key = course_code.upper()
                         courses[key] = {
                             'name': course_name,
-                            'credits': credits,
                             'code': course_code
                         }
 
-                        # Also store partial matches
-                        # Extract just the alphanumeric code part
-                        code_clean = re.sub(r'[^A-Z0-9]', '', course_code.upper())
-                        if code_clean and code_clean != key:
-                            courses[code_clean] = courses[key]
+        # Strategy 2: Fallback to timetable if courseplan fails
+        if not courses:
+            timetable_map = fetch_time_table(session)
+            for code, title in timetable_map.items():
+                courses[code.upper()] = {
+                    'name': title,
+                    'code': code
+                }
 
-        print(f"Fetched {len(courses)} courses from courseplan")
+        print(f"Fetched {len(courses)} courses")
         return courses
 
     except Exception as e:
         print(f"Error fetching course plan: {e}")
-        return {}
+        # Final fallback to timetable
+        try:
+            return fetch_time_table(session)
+        except:
+            return {}
 
 def find_course_name(subject_text, course_map):
-    """Enhanced course name matching with multiple strategies"""
+    """Course name matching with multiple strategies"""
     if not course_map:
         return subject_text
 
@@ -133,49 +162,50 @@ def find_course_name(subject_text, course_map):
 
     # Strategy 1: Direct lookup
     if original.upper() in course_map:
-        return course_map[original.upper()]['name']
+        return course_map[original.upper()].get('name', original) if isinstance(course_map[original.upper()], dict) else course_map[original.upper()]
 
     # Strategy 2: Extract course code patterns
-    # Look for patterns like CS8491, IT8501, etc.
     code_patterns = re.findall(r'[A-Z]{2,3}\d{4}', original.upper())
     for pattern in code_patterns:
         if pattern in course_map:
-            return course_map[pattern]['name']
+            return course_map[pattern].get('name', original) if isinstance(course_map[pattern], dict) else course_map[pattern]
 
     # Strategy 3: Look for any alphanumeric code
     code_clean = re.sub(r'[^A-Z0-9]', '', original.upper())
     if code_clean in course_map:
-        return course_map[code_clean]['name']
+        return course_map[code_clean].get('name', original) if isinstance(course_map[code_clean], dict) else course_map[code_clean]
 
-    # Strategy 4: Partial matching - find code within the text
+    # Strategy 4: Partial matching
     for code, course_info in course_map.items():
+        course_name = course_info.get('name', course_info) if isinstance(course_info, dict) else course_info
         if code in original.upper() or any(word in code for word in original.upper().split() if len(word) > 2):
-            return course_info['name']
+            return course_name
 
-    # Strategy 5: Reverse lookup - check if subject name matches any stored course name
+    # Strategy 5: Reverse lookup
     original_words = set(original.upper().split())
     for code, course_info in course_map.items():
-        course_words = set(course_info['name'].upper().split())
-        # If significant overlap in words, it might be the same course
+        course_name = course_info.get('name', course_info) if isinstance(course_info, dict) else course_info
+        course_words = set(course_name.upper().split())
         if len(original_words.intersection(course_words)) >= min(2, len(original_words)):
-            return course_info['name']
+            return course_name
 
-    # If no match found, return original
     return original
 
 def data_json(data, course_map=None):
+    """Data processing with course titles"""
     response = []
     for item in data[1:]:
         if len(item) < 10:
             continue
 
-        # Get enhanced course name from course map
+        # Get course name from course map
         original_name = item[0]
-        course_name = find_course_name(original_name, course_map) if course_map else original_name
+        course_title = find_course_name(original_name, course_map) if course_map else original_name
 
         temp = {
-            "name": course_name,  # Full course name from courseplan
-            "full_course_name": course_name,  # Explicit field for frontend
+            "name": course_title,  # Full course name/title
+            "course_title": course_title,  # Explicit field for course title
+            "course_code": original_name,  # Original course code
             "original_name": original_name,  # Keep original for reference
             "total_hours": int(item[1]),
             "exception_hour": int(item[2]),
