@@ -1,4 +1,4 @@
-/* Dark Theme - Mobile Optimized with Course Title Styling */
+/* Dark Theme - Mobile Optimized with Instagram Image and Gradient Text */
 * {
     margin: 0;
     padding: 0;
@@ -11,6 +11,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
     font-size: 16px;
+    min-height: 100vh;
 }
 
 .container {
@@ -35,158 +36,315 @@ h2 {
     padding-bottom: 0.5rem;
 }
 
-h3 {
-    font-size: 1.25rem;
-    margin: 1.5rem 0 0.75rem 0;
+/* Login Page Styles */
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+}
+
+.login-box {
+    background-color: #2a2a2a;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.logo-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.logo-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #4a9eff, #3a8eef);
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.logo-text {
+    color: white;
+    font-weight: bold;
+}
+
+.app-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #4a9eff, #3a8eef);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.app-subtitle {
     color: #cccccc;
+    font-size: 1rem;
+    margin-bottom: 0;
 }
 
-/* Forms */
+/* Form Styles */
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-label {
+.form-label {
     display: block;
     margin-bottom: 0.5rem;
     color: #cccccc;
     font-weight: 500;
 }
 
-input[type="text"],
-input[type="password"],
-input[type="email"] {
+.form-control {
     width: 100%;
     padding: 0.75rem;
     border: 1px solid #444;
-    border-radius: 4px;
-    background-color: #2a2a2a;
+    border-radius: 6px;
+    background-color: #1a1a1a;
     color: #ffffff;
     font-size: 1rem;
+    transition: border-color 0.3s ease;
 }
 
-input:focus {
+.form-control:focus {
     outline: none;
     border-color: #4a9eff;
+    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
 }
 
-button {
-    background-color: #4a9eff;
-    color: #ffffff;
+.btn {
     border: none;
+    border-radius: 6px;
     padding: 0.75rem 1.5rem;
-    border-radius: 4px;
     font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-button:hover {
-    background-color: #3a8eef;
-}
-
-/* Share Button Styling */
-.share-section {
-    margin: 2rem 0;
-    padding: 1rem 0;
-    border-top: 1px solid #333;
-}
-
-.share-btn {
-    background: linear-gradient(135deg, #4a9eff, #3a8eef);
-    color: #ffffff;
-    border: none;
-    padding: 0.75rem 2rem;
-    border-radius: 25px;
-    font-size: 1rem;
-    font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    font-weight: 600;
 }
 
-.share-btn:hover {
+.btn--primary {
+    background: linear-gradient(135deg, #4a9eff, #3a8eef);
+    color: #ffffff;
+}
+
+.btn--primary:hover {
+    background: linear-gradient(135deg, #3a8eef, #2a7edf);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 158, 255, 0.3);
+}
+
+.btn--secondary {
+    background: #f44336;
+    color: white;
+}
+
+.btn--secondary:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(244, 67, 54, 0.3);
+}
+
+.btn--gradient {
+    background: linear-gradient(135deg, #4a9eff, #3a8eef);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn--gradient:hover {
     background: linear-gradient(135deg, #3a8eef, #2a7edf);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
 }
 
-.share-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(74, 158, 255, 0.3);
-}
-
-/* Cards */
-.card {
-    background-color: #2a2a2a;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #333;
-}
-
-.card-header {
-    font-weight: bold;
+.login-btn {
+    width: 100%;
+    padding: 1rem;
     font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-    color: #4a9eff;
+    font-weight: bold;
 }
 
-/* Grid layouts */
-.grid {
-    display: grid;
+/* Instagram Icon and Gradient Text Styles */
+.instagram-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    vertical-align: middle;
+    border-radius: 4px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    object-fit: cover;
+}
+
+.instagram-fallback {
+    margin-right: 8px;
+    vertical-align: middle;
+    font-size: 18px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.social-link:hover .instagram-icon {
+    transform: scale(1.1) rotate(5deg);
+    filter: brightness(1.1);
+}
+
+.instagram-handle {
+    background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: #f9ce34; /* Fallback color for browsers that don't support gradients */
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.instagram-handle:hover {
+    transform: translateY(-1px);
+    text-shadow: 0 2px 8px rgba(249, 206, 52, 0.3);
+}
+
+/* Ensure gradient works across browsers */
+@supports not (-webkit-background-clip: text) {
+    .instagram-handle {
+        color: #f9ce34;
+    }
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #333;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Dashboard Styles */
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
     gap: 1rem;
-    margin: 1rem 0;
 }
 
-.grid-2 {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+.header-left h1 {
+    text-align: left;
+    margin-bottom: 0.5rem;
 }
 
-.grid-3 {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+.welcome-text {
+    color: #cccccc;
+    margin: 0;
 }
 
-.grid-4 {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+.header-right {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
 }
 
-/* Statistics */
+.share-btn {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+}
+
+.logout-btn {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+}
+
+/* CGPA Section - Updated for single card */
+.cgpa-section {
+    margin-bottom: 2rem;
+}
+
+.cgpa-card-container {
+    display: flex;
+    justify-content: center;
+}
+
 .stat-card {
     background-color: #2a2a2a;
-    padding: 1.5rem;
-    border-radius: 8px;
+    padding: 2rem;
+    border-radius: 12px;
     text-align: center;
     border: 1px solid #333;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.cgpa-card {
+    min-width: 200px;
+    border-left: 4px solid #4a9eff;
 }
 
 .stat-number {
-    font-size: 2rem;
+    font-size: 3rem;
     font-weight: bold;
     color: #4a9eff;
     display: block;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(74, 158, 255, 0.3);
 }
 
 .stat-label {
     color: #cccccc;
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-/* Subject Cards with Course Title Display */
+/* Subject Cards */
+.subjects-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
 .subject-card {
     background-color: #2a2a2a;
     border-radius: 12px;
     padding: 1.5rem;
     border-left: 4px solid #333;
-    margin-bottom: 1.5rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .subject-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .subject-card.success {
@@ -201,20 +359,23 @@ button:hover {
     border-left-color: #f44336;
 }
 
-/* Course Title Styling */
 .subject-title {
     font-weight: bold;
-    margin-bottom: 1rem;
     font-size: 1.3rem;
-    line-height: 1.4;
+    margin-bottom: 0.5rem;
     color: #ffffff;
-    background: linear-gradient(135deg, #4a9eff, #3a8eef);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    border-bottom: 1px solid #333;
-    padding-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.course-code {
+    color: #ff9800;
+    font-style: italic;
+    font-weight: 500;
+    background-color: rgba(255, 152, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 1rem;
 }
 
 .subject-main-info {
@@ -245,7 +406,6 @@ button:hover {
     font-size: 0.9rem;
 }
 
-/* Status Display */
 .status-display {
     text-align: center;
     flex: 1;
@@ -256,17 +416,14 @@ button:hover {
     font-weight: 900;
     display: block;
     margin-bottom: 0.25rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .status-number.status-can-miss {
     color: #4caf50;
-    text-shadow: 0 2px 4px rgba(76, 175, 80, 0.4);
 }
 
 .status-number.status-must-attend {
     color: #f44336;
-    text-shadow: 0 2px 4px rgba(244, 67, 54, 0.4);
     animation: pulse-critical 2s infinite;
 }
 
@@ -303,108 +460,24 @@ button:hover {
     margin-bottom: 0.25rem;
 }
 
-.subject-type {
-    color: #4a9eff;
-    font-weight: 500;
+.dashboard-footer {
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 3rem;
+    border-top: 1px solid #333;
+    color: #888;
+    font-size: 0.9rem;
 }
 
-/* Course Code Styling */
-.course-code {
-    color: #ff9800;
-    font-style: italic;
-    font-weight: 500;
-    background-color: rgba(255, 152, 0, 0.1);
-    padding: 2px 6px;
-    border-radius: 4px;
-    display: inline-block;
-}
-
-/* Tables */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #2a2a2a;
-    border-radius: 8px;
-    overflow: hidden;
-    margin: 1rem 0;
-}
-
-th, td {
-    padding: 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid #333;
-}
-
-th {
-    background-color: #4a9eff;
-    color: #ffffff;
-    font-weight: bold;
-}
-
-tr:hover {
-    background-color: rgba(74, 158, 255, 0.1);
-}
-
-/* Alerts */
-.alert {
-    padding: 1rem;
-    border-radius: 4px;
-    margin: 1rem 0;
-}
-
-.alert-success {
-    background-color: rgba(76, 175, 80, 0.2);
-    border: 1px solid #4caf50;
-    color: #4caf50;
-}
-
-.alert-warning {
-    background-color: rgba(255, 152, 0, 0.2);
-    border: 1px solid #ff9800;
-    color: #ff9800;
-}
-
-.alert-danger {
+/* Error Message */
+.error-message {
     background-color: rgba(244, 67, 54, 0.2);
     border: 1px solid #f44336;
     color: #f44336;
-}
-
-/* Login page specific */
-.login-container {
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background-color: #2a2a2a;
-    border-radius: 8px;
-    border: 1px solid #333;
-}
-
-.login-header {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
     text-align: center;
-    margin-bottom: 2rem;
-}
-
-.logo {
-    width: 60px;
-    height: 60px;
-    background-color: #4a9eff;
-    border-radius: 50%;
-    margin: 0 auto 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-/* Footer */
-footer {
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 2rem;
-    border-top: 1px solid #333;
-    color: #888;
 }
 
 /* Mobile Responsive */
@@ -421,10 +494,18 @@ footer {
         font-size: 1.25rem;
     }
 
-    .grid-2,
-    .grid-3,
-    .grid-4 {
-        grid-template-columns: 1fr;
+    .header-content {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .header-left h1 {
+        text-align: center;
+    }
+
+    .header-right {
+        justify-content: center;
     }
 
     .subject-main-info {
@@ -441,22 +522,18 @@ footer {
         font-size: 1.2rem;
     }
 
-    .share-btn {
-        padding: 0.75rem 1.5rem;
-        font-size: 0.9rem;
-    }
-
-    table {
-        font-size: 0.9rem;
-    }
-
-    th, td {
-        padding: 0.5rem;
-    }
-
-    .login-container {
+    .login-box {
         margin: 1rem;
         padding: 1.5rem;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+    }
+
+    .cgpa-card {
+        min-width: auto;
+        width: 100%;
     }
 }
 
@@ -469,14 +546,13 @@ footer {
         font-size: 1.5rem;
     }
 
-    .card,
     .stat-card,
     .subject-card {
         padding: 1rem;
     }
 
     .stat-number {
-        font-size: 1.5rem;
+        font-size: 2rem;
     }
 
     .percentage-number {
@@ -491,53 +567,22 @@ footer {
         font-size: 1.1rem;
     }
 
-    .share-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
+    .app-title {
+        font-size: 1.8rem;
     }
 
-    th, td {
-        padding: 0.4rem;
-        font-size: 0.8rem;
+    .header-right {
+        flex-direction: column;
+        gap: 0.5rem;
     }
-}
 
-/* Utility classes */
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-.text-left { text-align: left; }
+    .share-btn, .logout-btn {
+        width: 100%;
+        text-align: center;
+    }
 
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mt-3 { margin-top: 1.5rem; }
-
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-3 { margin-bottom: 1.5rem; }
-
-.p-1 { padding: 0.5rem; }
-.p-2 { padding: 1rem; }
-.p-3 { padding: 1.5rem; }
-
-.w-100 { width: 100%; }
-
-.d-flex { display: flex; }
-.justify-between { justify-content: space-between; }
-.align-center { align-items: center; }
-
-.hidden { display: none; }
-
-/* Loading animation */
-.loading {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid #333;
-    border-radius: 50%;
-    border-top-color: #4a9eff;
-    animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
+    .instagram-icon {
+        width: 18px;
+        height: 18px;
+    }
 }
