@@ -65,7 +65,7 @@ def get_attendance():
     if not attendance_data:
         return jsonify({"error": "No attendance data available"})
 
-    # Calculate overall statistics (still needed for backend calculations)
+    # Calculate overall statistics
     total_hours = sum(subject['total_hours'] for subject in attendance_data)
     total_present = sum(subject['total_present'] for subject in attendance_data)
     overall_percentage = (total_present / total_hours * 100) if total_hours > 0 else 0
@@ -132,6 +132,3 @@ def internal_server_error(e):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
-
-
