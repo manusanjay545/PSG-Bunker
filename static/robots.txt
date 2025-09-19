@@ -1,23 +1,7 @@
 User-agent: *
 Allow: /
-Disallow: /dashboard
-Disallow: /attendance
-Disallow: /cgpa  
-Disallow: /timetable
-Disallow: /login
-
-# Crawl delay
-Crawl-delay: 1
-
-# Sitemap
-Sitemap: https://psgbunker.com/sitemap.xml
-
-# Additional bots
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
+Allow: /login
+Allow: /about
+Disallow: /admin/
+Disallow: /api/private/
+Sitemap: https://psgbunker.in.net/sitemap.xml
