@@ -1,21 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://psgbunker.in.net/</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://psgbunker.in.net/login</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://psgbunker.in.net/dashboard</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-</urlset>
+from flask import Flask, Response, render_template, url_for
+from datetime import datetime
+import xml.etree.ElementTree as ET
+
+app = Flask(__name__)
+
+@app.route('/sitemap.xml')
+def sitemap():
+    """Generate XML sitemap for PSG-Bunker application"""
+    
+    # Create root element
+    urlset = ET.Element("urlset")
+    urlset.set("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9")
+    
+    # Static pages with their priority and change frequency
+    static_pages = [
+        {'loc': '/', 'priority': '1.0', 'changefreq': 'daily'},
+        {'loc': '/login', 'priority': '0.9', 'changefreq': 'monthly'},
+        {'loc': '/about', 'priority': '0.7', 'changefreq': 'monthly'},
+        {'loc': '/contact', 'priority': '0.6', 'changefreq': 'monthly'},
+        {'loc': '/help', 'priority': '0.5', 'changefreq': 'monthly'}
+    ]
+    
+    # Add static pages to sitemap
+    for page in static_pages:
+        url_elem = ET.SubElement(urlset, "url")
+        
+        loc_elem = ET.SubElement(url_elem, "loc")
+        loc_elem.text = f"https://psg-bunker.herokuapp.com{page['loc']}"
+        
+        lastmod_elem = ET.SubElement(url_elem, "lastmod")
+        lastmod_elem.text = datetime.now().strftime('%Y-%m-%d')
+        
+        changefreq_elem = ET.SubElement(url_elem, "changefreq")
+        changefreq_elem.text = page['changefreq']
+        
+        priority_elem = ET.SubElement(url_elem, "priority")
+        priority_elem.text = page['priority']
+    
+    # Generate XML string
+    xml_str = ET.tostring(urlset, encoding='utf-8', xml_declaration=True)
+    
+    # Return as XML response
+    response = Response(xml_str, mimetype='application/xml')
+    return response
