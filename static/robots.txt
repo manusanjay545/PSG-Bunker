@@ -1,7 +1,24 @@
-User-agent: *
+@app.route('/robots.txt')
+def robots_txt():
+    base_url = request.url_root.rstrip('/')
+    
+    robots_content = f'''User-agent: *
 Allow: /
 Allow: /login
 Allow: /about
+Allow: /static/
+
+# Protect student data
+Disallow: /dashboard/
+Disallow: /attendance/
+Disallow: /cgpa/
 Disallow: /admin/
-Disallow: /api/private/
-Sitemap: https://psgbunker.in.net/sitemap.xml
+Disallow: /*.json$
+
+# Sitemap
+Sitemap: {base_url}/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1'''
+    
+    return Response(robots_content, mimetype='text/plain')
