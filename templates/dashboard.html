@@ -5,158 +5,163 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - PSG Bunker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-    <!-- Favicon Implementation -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-    
-    
-
-
-    
 </head>
 <body>
     <div class="container">
-        <h1>📚 PSG Bunker Dashboard</h1>
-
-        <div class="card">
-            <div class="card-header">Welcome, {{ rollno }} | PSG College of Technology</div>
-        </div>
-
-        <!-- CGPA Section moved to top -->
-        <h2>🎓 Academic Performance</h2>
-        <div class="grid grid-3">
-            <div class="stat-card">
-                <span class="stat-number">{{ cgpa.total_cgpa or '0.0' }}</span>
-                <div class="stat-label">Total CGPA</div>
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>📚 PSG Bunker Dashboard</h1>
+                    <p class="welcome-text">Welcome, {{ rollno }} | PSG College of Technology</p>
+                </div>
+                <div class="header-right">
+                    <button id="shareBtn" class="btn btn--gradient share-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.18875 15.0129 5.37498 15.0378 5.55669L8.95808 9.01006C8.41831 8.39293 7.66395 8 6.81818 8C5.16134 8 3.81818 9.34315 3.81818 11C3.81818 12.6569 5.16134 14 6.81818 14C7.66395 14 8.41831 13.6071 8.95808 12.9899L15.0378 16.4433C15.0129 16.625 15 16.8113 15 17C15 18.6569 16.3431 20 18 20C19.6569 20 21 18.6569 21 17C21 15.3431 19.6569 14 18 14C17.1542 14 16.3998 14.3929 15.8601 15.0101L9.78033 11.5567C9.80524 11.375 9.81818 11.1887 9.81818 11C9.81818 10.8113 9.80524 10.625 9.78033 10.4433L15.8601 6.98994C16.3998 7.60706 17.1542 8 18 8Z" fill="currentColor"/>
+                        </svg>
+                        Share App
+                    </button>
+                    <a href="/" class="btn btn--secondary logout-btn">Logout</a>
+                </div>
             </div>
-            <div class="stat-card">
-                <span class="stat-number">{{ cgpa.latest_sem or '-' }}</span>
-                <div class="stat-label">Latest Semester</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">{{ cgpa.total_semesters or '0' }}</span>
-                <div class="stat-label">Semesters Completed</div>
-            </div>
-        </div>
+        </header>
 
-        <!-- Subject-wise Attendance Section -->
-        <h2>📚 Subject-wise Attendance</h2>
-        <div id="attendanceContainer">
-            <div class="loading"></div>
-            <p>Loading attendance data...</p>
-        </div>
-
-        <!-- Share Section -->
-        <div class="share-section text-center">
-            <button class="share-btn" onclick="shareApp()">
-                📤 Share PSG Bunker
-            </button>
-        </div>
-
-        <!-- Developer Credit and Instagram Link at Bottom -->
-        <div style="text-align: center; margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #333; color: #888;">
-            <div style="margin-bottom: 0.5rem; font-size: 0.9rem;">
-                Website developed by Manu Sanjay Btech-IT PSG TECH
+        <section class="cgpa-section">
+            <h2>🎓 Academic Performance</h2>
+            <div class="cgpa-card-container">
+                <div class="stat-card cgpa-card">
+                    <div class="stat-number">{{ cgpa.total_cgpa or '0.0' }}</div>
+                    <div class="stat-label">LAST SEM CGPA</div>
+                </div>
             </div>
-            <a href="https://www.instagram.com/manu_sanjay.m" target="_blank" style="color: #4a9eff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center;">
-                <img src="https://img.icons8.com/?size=100&id=BrU2BBoRXiWq&format=png&color=4a9eff" alt="Instagram" style="width: 20px; height: 20px;">
-                @manu_sanjay.m
-            </a>
-        </div>
+        </section>
+
+        <section class="attendance-section">
+            <h2>📚 Subject-wise Attendance</h2>
+            <div class="subjects-grid">
+                {% for subject in attendance %}
+                <div class="subject-card {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
+                    <div class="subject-title">{{ subject.course_title }}</div>
+                    <div class="course-code">{{ subject.name }}</div>
+
+                    <div class="subject-main-info">
+                        <div class="attendance-percentage">
+                            <span class="percentage-number {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
+                                {{ "%.1f"|format(subject.percentage_of_attendance) }}%
+                            </span>
+                            <div class="attendance-details">
+                                {{ subject.total_present }}/{{ subject.total_hours }} classes attended
+                            </div>
+                        </div>
+
+                        <div class="status-display">
+                            {% if subject.percentage_of_attendance < 75 %}
+                                <span class="status-number status-must-attend">{{ subject.class_to_attend }}</span>
+                                <div class="status-label status-must-attend">Must Attend</div>
+                            {% else %}
+                                <span class="status-number status-can-miss">{{ subject.class_to_bunk }}</span>
+                                <div class="status-label status-can-miss">Can Miss</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="subject-footer">
+                        <div>From: {{ subject.attendance_from }}</div>
+                        <div>To: {{ subject.attendance_to }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <footer class="dashboard-footer">
+            <p>Website developed by <strong>Manu Sanjay</strong> Btech-IT PSG TECH</p>
+            <p class="social-link">
+                <img src="https://img.freepik.com/premium-psd/instagram-logo_971166-164497.jpg?semt=ais_incoming&w=740&q=80" 
+                     alt="Instagram" class="instagram-icon" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <span class="instagram-fallback" style="display: none;">📷</span>
+                <a href="https://instagram.com/manu_sanjay.m" target="_blank" class="instagram-handle">@manu_sanjay.m</a>
+            </p>
+        </footer>
     </div>
 
     <script>
-        // Load attendance data
-        fetch('/attendance')
-            .then(response => response.json())
-            .then(data => {
-                displayAttendance(data);
-            })
-            .catch(error => {
-                console.error('Error loading attendance:', error);
-                document.getElementById('attendanceContainer').innerHTML = 
-                    '<div class="alert alert-danger">Error loading attendance data</div>';
-            });
+        // Share functionality
+        document.getElementById('shareBtn').addEventListener('click', async function() {
+            const shareData = {
+                title: 'PSG Bunker - Attendance Tracker',
+                text: 'Check out PSG Bunker - the smart attendance tracker for PSG Tech students!',
+                url: window.location.origin
+            };
 
-        function displayAttendance(data) {
-            const container = document.getElementById('attendanceContainer');
-
-            if (data.error) {
-                container.innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
-                return;
-            }
-
-            let html = '';
-
-            // REMOVED: Overall stats section (Total Classes, Attended, Overall %, Must Attend/Can Miss)
-            // Now directly showing individual subject cards
-
-            // Subject cards (without subject type display)
-            data.subjects.forEach(subject => {
-                const statusClass = subject.percentage_of_attendance >= 75 ? 'success' : 'danger';
-                const percentageClass = getPercentageClass(subject.percentage_of_attendance);
-
-                html += `
-                    <div class="subject-card ${statusClass}">
-                        <div class="subject-title">${subject.display_name || subject.name}</div>
-
-                        <div class="subject-main-info">
-                            <div class="attendance-percentage">
-                                <span class="percentage-number ${percentageClass}">${subject.percentage_of_attendance.toFixed(1)}%</span>
-                                <div class="attendance-details">
-                                    ${subject.total_present}/${subject.total_hours} classes attended
-                                </div>
-                            </div>
-
-                            <div class="status-display">
-                                <span class="status-number ${subject.classes_to_attend > 0 ? 'status-must-attend' : 'status-can-miss'}">
-                                    ${subject.classes_to_attend > 0 ? subject.classes_to_attend : subject.classes_to_bunk}
-                                </span>
-                                <div class="status-label ${subject.classes_to_attend > 0 ? 'status-must-attend' : 'status-can-miss'}">
-                                    ${subject.classes_to_attend > 0 ? 'Must Attend' : 'Can Miss'}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="subject-footer">
-                            <div><strong>Period:</strong> ${subject.attendance_from} to ${subject.attendance_to}</div>
-                            <div><strong>Total Hours:</strong> ${subject.total_hours} | <strong>Exception:</strong> ${subject.exception_hour}</div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        function getPercentageClass(percentage) {
-            if (percentage >= 85) return 'success';
-            if (percentage >= 75) return 'warning';
-            return 'danger';
-        }
-
-        function shareApp() {
             if (navigator.share) {
-                navigator.share({
-                    title: 'PSG Bunker - Attendance Tracker',
-                    text: 'Check out PSG Bunker - Easy attendance and CGPA tracking for PSG Tech students!',
-                    url: window.location.origin
-                });
-            } else {
-                // Fallback for browsers that don't support Web Share API
-                const url = window.location.origin;
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText(url).then(() => {
-                        alert('App link copied to clipboard!');
-                    });
-                } else {
-                    alert(`Share this link: ${url}`);
+                try {
+                    await navigator.share(shareData);
+                    console.log('Successfully shared');
+                } catch (err) {
+                    console.log('Error sharing:', err);
+                    fallbackShare(shareData.url);
                 }
+            } else {
+                fallbackShare(shareData.url);
             }
+        });
+
+        function fallbackShare(url) {
+            navigator.clipboard.writeText(url).then(function() {
+                // Show a toast notification
+                showToast('Link copied to clipboard!');
+            }).catch(function(err) {
+                console.error('Could not copy text: ', err);
+                showToast('Unable to share. Please copy the URL manually.');
+            });
         }
+
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+
+            // Style the toast
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4a9eff;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 6px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+
+            document.body.appendChild(toast);
+
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS for toast animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
