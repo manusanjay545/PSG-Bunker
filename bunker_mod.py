@@ -1,137 +1,134 @@
-import os
 import math
-from flask import Flask, render_template, request, jsonify, session as flask_session, send_from_directory, redirect
-from bunker_mod import return_attendance, data_json, return_cgpa, get_course_plan
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import numpy as np
 
-app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'psg-bunker-secret-key-change-in-production')
+def gradeMap(grade):
+    grade_map = {
+        "O": 10, "A+": 9, "A": 8, "B+": 7, 
+        "B": 6, "C+": 5, "C": 4, "RA": 0, "SA": 0, "W": 0
+    }
+    return grade_map.get(grade.strip().upper(), 0)
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+def return_attendance(username, pwd):
+    try:
+        session = requests.Session()
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+        
+        # Login
+        login_url = "https://ecampus.psgtech.ac.in/studzone2/"
+        r = session.get(login_url, headers=headers)
+        soup = BeautifulSoup(r.text, 'html.parser')
+        
+        viewstate = soup.select("#__VIEWSTATE")[0]["value"]
+        eventvalidation = soup.select("#__EVENTVALIDATION")[0]["value"]
+        viewstategen = soup.select("#__VIEWSTATEGENERATOR")[0]["value"]
 
-@app.route('/login', methods=['POST'])
-def login():
-    # Handle both form and JSON data
-    if request.is_json:
-        rollno = request.json.get('rollno')
-        password = request.json.get('password')
-    else:
-        rollno = request.form.get('rollno')
-        password = request.form.get('password')
+        payload = {
+            "__VIEWSTATE": viewstate,
+            "__VIEWSTATEGENERATOR": viewstategen,
+            "__EVENTVALIDATION": eventvalidation,
+            "txtusercheck": username,
+            "txtpwdcheck": pwd,
+            "abcd3": "Login"
+        }
 
-    if not rollno or not password:
-        if request.is_json:
-            return jsonify({"ok": False, "message": "Roll number and password are required"})
+        session.post(login_url, data=payload, headers=headers)
+        
+        # Get attendance
+        attendance_url = "https://ecampus.psgtech.ac.in/studzone2/AttWfPercView.aspx"
+        page = session.get(attendance_url, headers=headers)
+        soup = BeautifulSoup(page.text, 'html.parser')
+        
+        table = soup.find("table", {"class": "cssbody"})
+        if not table:
+            return "Attendance data not available or invalid credentials"
+
+        data = []
+        for row in table.find_all("tr"):
+            cols = [ele.text.strip() for ele in row.find_all("td")]
+            data.append([ele for ele in cols if ele])
+        
+        return data, session
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+def data_json(data):
+    response = []
+    for item in data[1:]:
+        if len(item) < 10:
+            continue
+            
+        temp = {
+            "name": item[0],
+            "total_hours": int(item[1]),
+            "exception_hour": int(item[2]),
+            "total_present": int(item[4]),
+            "percentage_of_attendance": float(item[5]),
+            "attendance_from": item[8],
+            "attendance_to": item[9]
+        }
+        
+        if temp['percentage_of_attendance'] < 75:
+            temp['class_to_attend'] = math.ceil(
+                (0.75 * temp['total_hours'] - temp['total_present']) / 0.25
+            )
         else:
-            return render_template("index.html", error="Roll number and password are required")
+            temp['class_to_bunk'] = math.floor(
+                (temp['total_present'] - 0.75 * temp['total_hours']) / 0.75
+            )
+        
+        response.append(temp)
+    return response
 
-    result = return_attendance(rollno, password)
-
-    if isinstance(result, str):
-        if request.is_json:
-            return jsonify({"ok": False, "message": result})
-        else:
-            return render_template("index.html", error=result)
-
-    attendance_raw, session = result
-
-    # Get real course plan data with course titles
-    course_plan = get_course_plan(session)
-
-    # Process attendance data with real course names from courseplan
-    attendance_data = data_json(attendance_raw, course_plan)
-    cgpa_data = return_cgpa(session)
-
-    # Store data in Flask session for API endpoints
-    flask_session['attendance_data'] = attendance_data
-    flask_session['cgpa_data'] = cgpa_data
-    flask_session['course_plan'] = course_plan
-    flask_session['rollno'] = rollno
-
-    if request.is_json:
-        return jsonify({"ok": True})
-    else:
-        return render_template("dashboard.html",
-                             rollno=rollno,
-                             attendance=attendance_data,
-                             cgpa=cgpa_data)
-
-@app.route('/attendance')
-def get_attendance():
-    """API endpoint for attendance data with course titles"""
-    attendance_data = flask_session.get('attendance_data', [])
-
-    if not attendance_data:
-        return jsonify({"error": "No attendance data available"})
-
-    # Calculate overall statistics (still needed for backend calculations)
-    total_hours = sum(subject['total_hours'] for subject in attendance_data)
-    total_present = sum(subject['total_present'] for subject in attendance_data)
-    overall_percentage = (total_present / total_hours * 100) if total_hours > 0 else 0
-
-    # Calculate bunkable/need days for 75% threshold
-    if overall_percentage < 75:
-        need_days = math.ceil((0.75 * total_hours - total_present) / 0.25)
-        bunkable_days = 0
-    else:
-        need_days = 0
-        bunkable_days = int((total_present - 0.75 * total_hours) / 0.75)
-
-    # Include course titles in response
-    subjects_with_titles = []
-    for subject in attendance_data:
-        subject_with_title = subject.copy()
-        subject_with_title['display_name'] = subject.get('course_title', subject.get('name', subject.get('original_name', 'Unknown Course')))
-        subjects_with_titles.append(subject_with_title)
-
-    return jsonify({
-        "subjects": subjects_with_titles,
-        "total_days": total_hours,
-        "attended_days": total_present,
-        "percentage": overall_percentage,
-        "need_days": need_days,
-        "bunkable_days": bunkable_days
-    })
-
-@app.route('/cgpa')
-def get_cgpa():
-    """API endpoint for CGPA data"""
-    cgpa_data = flask_session.get('cgpa_data', {})
-    return jsonify(cgpa_data)
-
-@app.route('/courses')
-def get_courses():
-    """API endpoint to get course mapping"""
-    course_plan = flask_session.get('course_plan', {})
-    return jsonify(course_plan)
-
-@app.route('/dashboard')
-def dashboard():
-    """Dashboard page route with course titles"""
-    if 'rollno' not in flask_session:
-        return redirect('/')
-
-    return render_template("dashboard.html",
-                         rollno=flask_session['rollno'],
-                         attendance=flask_session.get('attendance_data', []),
-                         cgpa=flask_session.get('cgpa_data', {}))
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory('static', 'favicon.ico')
-
-# Error handlers
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
-
-
-
+def return_cgpa(session):
+    try:
+        # Get results
+        results_url = "https://ecampus.psgtech.ac.in/studzone2/FrmEpsStudResult.aspx"
+        page = session.get(results_url)
+        soup = BeautifulSoup(page.text, 'html.parser')
+        
+        table = soup.find("table", {"id": "DgResult"})
+        if not table:
+            return {"error": "No results found"}
+        
+        # Process results
+        data = []
+        for row in table.find_all("tr")[1:]:  # Skip header
+            cols = [ele.text.strip() for ele in row.find_all("td")]
+            if len(cols) >= 6:  # Ensure valid row
+                data.append({
+                    "semester": cols[0],
+                    "code": cols[1],
+                    "title": cols[2],
+                    "credits": int(cols[3]),
+                    "grade": cols[4].split()[-1],  # Get last part (handles cases like "A+")
+                    "result": cols[5]
+                })
+        
+        # Calculate CGPA
+        total_points = 0
+        total_credits = 0
+        latest_sem = ""
+        
+        for course in data:
+            if course["credits"] > 0 and course["grade"] in ["O","A+","A","B+","B","C+","C"]:
+                total_points += course["credits"] * gradeMap(course["grade"])
+                total_credits += course["credits"]
+                if course["semester"] > latest_sem:
+                    latest_sem = course["semester"]
+        
+        cgpa = total_points / total_credits if total_credits > 0 else 0
+        
+        return {
+            "lastest_sem": latest_sem,
+            "latest_sem_cgpa": round(cgpa, 3),
+            "courses": data
+        }
+        
+    except Exception as e:
+        return {"error": str(e)}
