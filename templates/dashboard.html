@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta name="title" content="PSG Bunker - Student Attendance & CGPA Tracker">
-<meta name="description" content="Secure web application for PSG College of Technology students to track attendance, calculate CGPA, and manage academic data with mobile-optimized interface">
-<meta name="keywords" content="PSG Tech, attendance tracker, CGPA calculator, student portal, academic management">
-<meta name="robots" content="index, follow">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Secure web application for PSG College of Technology students to track attendance, calculate CGPA, and manage academic data with mobile-optimized interface">
+    <meta name="keywords" content="PSG Tech, attendance tracker, CGPA calculator, student portal, academic management">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,7 +67,7 @@
                                 <div class="status-label status-must-attend">Must Attend</div>
                             {% else %}
                                 <span class="status-number status-can-miss">{{ subject.class_to_bunk }}</span>
-                                <div class="status-label status-can-miss">Can Miss</div>
+                                <div class="status-label status-can-miss">Can Bunk</div>
                             {% endif %}
                         </div>
                     </div>
@@ -168,6 +168,13 @@
             }
         `;
         document.head.appendChild(style);
+    </script>
+
+    <!-- Popup message on page load -->
+    <script>
+      window.onload = function() {
+        alert("This website shows you how many classes you can miss ('bunk') while ensuring your physical attendance stays above 75%.");
+      };
     </script>
 </body>
 </html>
