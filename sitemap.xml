@@ -1,0 +1,54 @@
+@app.route('/sitemap.xml')
+def sitemap():
+    # Get the base URL dynamically
+    base_url = request.url_root.rstrip('/')
+    
+    # Create sitemap XML structure
+    urlset = ET.Element("urlset")
+    urlset.set("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9")
+    
+    # Define PSG-Bunker specific pages
+    sitemap_pages = [
+        {
+            'url': '/',
+            'priority': '1.0',
+            'changefreq': 'daily',
+            'lastmod': datetime.now().strftime('%Y-%m-%d')
+        },
+        {
+            'url': '/login', 
+            'priority': '0.9',
+            'changefreq': 'monthly',
+            'lastmod': '2025-09-19'
+        },
+        {
+            'url': '/about',
+            'priority': '0.6', 
+            'changefreq': 'monthly',
+            'lastmod': '2025-09-01'
+        }
+    ]
+    
+    # Build XML structure
+    for page_info in sitemap_pages:
+        url_elem = ET.SubElement(urlset, "url")
+        
+        # Location
+        loc_elem = ET.SubElement(url_elem, "loc") 
+        loc_elem.text = f"{base_url}{page_info['url']}"
+        
+        # Last modified
+        lastmod_elem = ET.SubElement(url_elem, "lastmod")
+        lastmod_elem.text = page_info['lastmod']
+        
+        # Change frequency  
+        changefreq_elem = ET.SubElement(url_elem, "changefreq")
+        changefreq_elem.text = page_info['changefreq']
+        
+        # Priority
+        priority_elem = ET.SubElement(url_elem, "priority")
+        priority_elem.text = page_info['priority']
+    
+    # Convert to XML and return
+    xml_content = ET.tostring(urlset, encoding='utf-8', xml_declaration=True)
+    return Response(xml_content, mimetype='application/xml')
