@@ -1,5 +1,0 @@
-{
-  "redirects": [
-    { "source": "/(.*)", "destination": "https://psgbunker.in/$1", "permanent": true }
-  ]
-}
