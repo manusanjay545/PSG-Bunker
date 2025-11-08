@@ -45,7 +45,7 @@ def return_attendance(username, pwd):
 
         table = soup.find("table", {"class": "cssbody"})
         if not table:
-            return "Attendance data not available or invalid credentials"
+            return "Attendance data is updatng try again later or invalid password"
 
         data = []
         for row in table.find_all("tr"):
