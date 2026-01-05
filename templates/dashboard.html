@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta name="title" content="PSG Bunker - Student Attendance & CGPA Tracker">
-    <meta name="description" content="Secure web application for PSG College of Technology students to track attendance, calculate CGPA, and manage academic data with mobile-optimized interface">
+    <meta name="description"
+        content="Secure web application for PSG College of Technology students to track attendance, calculate CGPA, and manage academic data with mobile-optimized interface">
     <meta name="keywords" content="PSG Tech, attendance tracker, CGPA calculator, student portal, academic management">
     <meta name="robots" content="index, follow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +15,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
+
 <body>
     <div class="container">
         <header class="dashboard-header">
@@ -22,13 +25,23 @@
                     <p class="welcome-text">Welcome, {{ rollno }} | PSG College of Technology</p>
                 </div>
                 <div class="header-right">
-                    <button id="shareBtn" class="btn btn--gradient share-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.18875 15.0129 5.37498 15.0378 5.55669L8.95808 9.01006C8.41831 8.39293 7.66395 8 6.81818 8C5.16134 8 3.81818 9.34315 3.81818 11C3.81818 12.6569 5.16134 14 6.81818 14C7.66395 14 8.41831 13.6071 8.95808 12.9899L15.0378 16.4433C15.0129 16.625 15 16.8113 15 17C15 18.6569 16.3431 20 18 20C19.6569 20 21 18.6569 21 17C21 15.3431 19.6569 14 18 14C17.1542 14 16.3998 14.3929 15.8601 15.0101L9.78033 11.5567C9.80524 11.375 9.81818 11.1887 9.81818 11C9.81818 10.8113 9.80524 10.625 9.78033 10.4433L15.8601 6.98994C16.3998 7.60706 17.1542 8 18 8Z" fill="currentColor"/>
-                        </svg>
-                        Share App
-                    </button>
-                    <a href="/" class="btn btn--secondary logout-btn">Logout</a>
+                    <div class="header-buttons">
+                        <button id="shareBtn" class="btn btn--gradient share-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.18875 15.0129 5.37498 15.0378 5.55669L8.95808 9.01006C8.41831 8.39293 7.66395 8 6.81818 8C5.16134 8 3.81818 9.34315 3.81818 11C3.81818 12.6569 5.16134 14 6.81818 14C7.66395 14 8.41831 13.6071 8.95808 12.9899L15.0378 16.4433C15.0129 16.625 15 16.8113 15 17C15 18.6569 16.3431 20 18 20C19.6569 20 21 18.6569 21 17C21 15.3431 19.6569 14 18 14C17.1542 14 16.3998 14.3929 15.8601 15.0101L9.78033 11.5567C9.80524 11.375 9.81818 11.1887 9.81818 11C9.81818 10.8113 9.80524 10.625 9.78033 10.4433L15.8601 6.98994C16.3998 7.60706 17.1542 8 18 8Z"
+                                    fill="currentColor" />
+                            </svg>
+                            Share App
+                        </button>
+                        <a href="{{ url_for('static', filename='PSG Bunker.apk') }}"
+                            class="btn btn--gradient download-btn-dashboard" download>
+                            <img src="{{ url_for('static', filename='favicon.ico') }}" alt="App Icon"
+                                class="btn-icon-small">
+                            Download App
+                        </a>
+                        <a href="/" class="btn btn--secondary logout-btn">Logout</a>
+                    </div>
                 </div>
             </div>
         </header>
@@ -47,13 +60,15 @@
             <h2>📚 Subject-wise Attendance</h2>
             <div class="subjects-grid">
                 {% for subject in attendance %}
-                <div class="subject-card {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
+                <div
+                    class="subject-card {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
                     <div class="subject-title">{{ subject.course_title }}</div>
                     <div class="course-code">{{ subject.name }}</div>
 
                     <div class="subject-main-info">
                         <div class="attendance-percentage">
-                            <span class="percentage-number {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
+                            <span
+                                class="percentage-number {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
                                 {{ "%.1f"|format(subject.percentage_of_attendance) }}%
                             </span>
                             <div class="attendance-details">
@@ -62,13 +77,17 @@
                         </div>
 
                         <div class="status-display">
-                            {% if subject.percentage_of_attendance < 75 %}
+                            {% if subject.percentage_of_attendance < 75 %} <img
+                                src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyN2JsOGVwbzRxanBkbnQ3bHB1OG1uOGRjYXVsdWo2eWVsNGxvbDRzciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/98MaHVwJOmWMz4cz1K/200.gif"
+                                alt="Stress" class="status-gif">
                                 <span class="status-number status-must-attend">{{ subject.class_to_attend }}</span>
                                 <div class="status-label status-must-attend">Must Attend</div>
-                            {% else %}
+                                {% else %}
+                                <img src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUydGxlYmt0OHBhdzI1Zjd6ZGYzcmNtcWJzeW14bW5wejV4M2V4YnRiaCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UO5elnTqo4vSg/200.gif"
+                                    alt="Party" class="status-gif">
                                 <span class="status-number status-can-miss">{{ subject.class_to_bunk }}</span>
                                 <div class="status-label status-can-miss">Can Bunk</div>
-                            {% endif %}
+                                {% endif %}
                         </div>
                     </div>
 
@@ -84,18 +103,19 @@
         <footer class="dashboard-footer">
             <p>Website developed by <strong>Manu Sanjay</strong> Btech-IT PSG TECH</p>
             <p class="social-link">
-                <img src="https://img.freepik.com/premium-psd/instagram-logo_971166-164497.jpg?semt=ais_incoming&w=740&q=80" 
-                     alt="Instagram" class="instagram-icon" 
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <img src="https://img.freepik.com/premium-psd/instagram-logo_971166-164497.jpg?semt=ais_incoming&w=740&q=80"
+                    alt="Instagram" class="instagram-icon"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
                 <span class="instagram-fallback" style="display: none;">📷</span>
-                <a href="https://instagram.com/manu_sanjay.m" target="_blank" class="instagram-handle">@manu_sanjay.m</a>
+                <a href="https://instagram.com/manu_sanjay.m" target="_blank"
+                    class="instagram-handle">@manu_sanjay.m</a>
             </p>
         </footer>
     </div>
 
     <script>
         // Share functionality
-        document.getElementById('shareBtn').addEventListener('click', async function() {
+        document.getElementById('shareBtn').addEventListener('click', async function () {
             const shareData = {
                 title: 'PSG Bunker - Attendance Tracker',
                 text: 'Check out PSG Bunker - the smart attendance tracker for PSG Tech students!',
@@ -116,10 +136,10 @@
         });
 
         function fallbackShare(url) {
-            navigator.clipboard.writeText(url).then(function() {
+            navigator.clipboard.writeText(url).then(function () {
                 // Show a toast notification
                 showToast('Link copied to clipboard!');
-            }).catch(function(err) {
+            }).catch(function (err) {
                 console.error('Could not copy text: ', err);
                 showToast('Unable to share. Please copy the URL manually.');
             });
@@ -172,9 +192,10 @@
 
     <!-- Popup message on page load -->
     <script>
-      window.onload = function() {
-        alert("This website shows you how many classes you can miss ('bunk') while ensuring your physical attendance stays above 75%.");
-      };
+        window.onload = function () {
+            alert("This website shows you how many classes you can miss ('bunk') while ensuring your physical attendance stays above 75%.");
+        };
     </script>
 </body>
+
 </html>
