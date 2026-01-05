@@ -23,6 +23,11 @@ def login():
     if not rollno or not password:
         if request.is_json:
             return jsonify({"ok": False, "message": "Roll number and password are required"})
+
+
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory('static', 'robots.txt')        
         else:
             return render_template("index.html", error="Roll number and password are required")
 
@@ -132,3 +137,4 @@ def internal_server_error(e):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+
