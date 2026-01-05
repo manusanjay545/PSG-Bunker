@@ -168,11 +168,12 @@ def robots():
     base_url = request.url_root.rstrip('/')
     robots_content = f"""User-agent: *
 Allow: /
+
+# Block authenticated/API pages
 Disallow: /dashboard
 Disallow: /attendance
 Disallow: /cgpa
 Disallow: /courses
-Disallow: /login
 
 Sitemap: {base_url}/sitemap.xml
 """
