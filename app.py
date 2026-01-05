@@ -1,6 +1,8 @@
 import os
 import math
-from flask import Flask, render_template, request, jsonify, session as flask_session, send_from_directory, redirect
+from datetime import datetime
+import xml.etree.ElementTree as ET
+from flask import Flask, render_template, request, jsonify, session as flask_session, send_from_directory, redirect, Response
 from bunker_mod import return_attendance, data_json, return_cgpa, get_course_plan
 
 app = Flask(__name__)
@@ -23,11 +25,6 @@ def login():
     if not rollno or not password:
         if request.is_json:
             return jsonify({"ok": False, "message": "Roll number and password are required"})
-
-
-@app.route('/robots.txt')
-def robots():
-    return send_from_directory('static', 'robots.txt')        
         else:
             return render_template("index.html", error="Roll number and password are required")
 
@@ -126,6 +123,61 @@ def dashboard():
 def favicon():
     return send_from_directory('static', 'favicon.ico')
 
+@app.route('/sitemap.xml')
+def sitemap():
+    """Generate dynamic sitemap for SEO"""
+    base_url = request.url_root.rstrip('/')
+    
+    # Create sitemap XML structure
+    urlset = ET.Element("urlset")
+    urlset.set("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9")
+    
+    # Define pages to index
+    sitemap_pages = [
+        {
+            'url': '/',
+            'priority': '1.0',
+            'changefreq': 'daily',
+            'lastmod': datetime.now().strftime('%Y-%m-%d')
+        }
+    ]
+    
+    # Build XML structure
+    for page_info in sitemap_pages:
+        url_elem = ET.SubElement(urlset, "url")
+        
+        loc_elem = ET.SubElement(url_elem, "loc")
+        loc_elem.text = f"{base_url}{page_info['url']}"
+        
+        lastmod_elem = ET.SubElement(url_elem, "lastmod")
+        lastmod_elem.text = page_info['lastmod']
+        
+        changefreq_elem = ET.SubElement(url_elem, "changefreq")
+        changefreq_elem.text = page_info['changefreq']
+        
+        priority_elem = ET.SubElement(url_elem, "priority")
+        priority_elem.text = page_info['priority']
+    
+    xml_content = ET.tostring(urlset, encoding='unicode', method='xml')
+    xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    return Response(xml_declaration + xml_content, mimetype='application/xml')
+
+@app.route('/robots.txt')
+def robots():
+    """Generate robots.txt for SEO"""
+    base_url = request.url_root.rstrip('/')
+    robots_content = f"""User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /attendance
+Disallow: /cgpa
+Disallow: /courses
+Disallow: /login
+
+Sitemap: {base_url}/sitemap.xml
+"""
+    return Response(robots_content, mimetype='text/plain')
+
 # Error handlers
 @app.errorhandler(404)
 def page_not_found(e):
@@ -137,4 +189,3 @@ def internal_server_error(e):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
