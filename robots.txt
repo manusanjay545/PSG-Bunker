@@ -1,8 +1,2 @@
 User-agent: *
 Allow: /
-Disallow: /dashboard
-Disallow: /attendance
-Disallow: /cgpa
-Disallow: /courses
-
-Sitemap: https://psgbunker.in.net/sitemap.xml
