@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta name="title" content="PSG Bunker - Student Attendance & CGPA Tracker">
-<meta name="description" content="Secure web application for PSG College of Technology students to track attendance, calculate CGPA, and manage academic data with mobile-optimized interface">
-<meta name="keywords" content="PSG Tech, attendance tracker, CGPA calculator, student portal, academic management">
-<meta name="robots" content="index, follow">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Secure web application for PSG College of Technology students to track attendance, calculate CGPA, and manage academic data with mobile-optimized interface">
+    <meta name="keywords" content="PSG Tech, attendance tracker, CGPA calculator, student portal, academic management">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +15,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-box">
@@ -33,12 +36,14 @@
             <form method="POST" action="/login" class="login-form">
                 <div class="form-group">
                     <label for="rollno" class="form-label">Roll Number:</label>
-                    <input type="text" id="rollno" name="rollno" class="form-control" placeholder="Enter your roll number" required>
+                    <input type="text" id="rollno" name="rollno" class="form-control"
+                        placeholder="Enter your roll number" required>
                 </div>
 
                 <div class="form-group">
                     <label for="password" class="form-label">Password:</label>
-                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Enter your password" required>
                 </div>
 
                 <button type="submit" class="btn btn--primary login-btn">
@@ -47,17 +52,57 @@
             </form>
 
             <footer class="login-footer">
+                <a href="{{ url_for('static', filename='PSG Bunker.apk') }}" class="btn btn--gradient download-btn"
+                    download>
+                    <img src="{{ url_for('static', filename='favicon.ico') }}" alt="App Icon" class="btn-icon"> Download
+                    Android App
+                </a>
                 <p>Website developed by <strong>Manu Sanjay</strong> Btech-IT PSG TECH</p>
                 <p class="social-link">
-                    <img src="https://img.freepik.com/premium-psd/instagram-logo_971166-164497.jpg?semt=ais_incoming&w=740&q=80" 
-                         alt="Instagram" class="instagram-icon" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                    <img src="https://img.freepik.com/premium-psd/instagram-logo_971166-164497.jpg?semt=ais_incoming&w=740&q=80"
+                        alt="Instagram" class="instagram-icon"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
                     <span class="instagram-fallback" style="display: none;">📷</span>
-                    <a href="https://instagram.com/manu_sanjay.m" target="_blank" class="instagram-handle">@manu_sanjay.m</a>
+                    <a href="https://instagram.com/manu_sanjay.m" target="_blank"
+                        class="instagram-handle">@manu_sanjay.m</a>
                 </p>
             </footer>
         </div>
     </div>
-<script defer src="/_vercel/insights/script.js"></script>
+
+    <!-- Download App Modal -->
+    <div id="downloadModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">×</button>
+            <div class="modal-icon-container">
+                <img src="{{ url_for('static', filename='favicon.ico') }}" alt="App Icon" class="modal-app-icon">
+            </div>
+            <h2>Get the App!</h2>
+            <p>Download the PSG Bunker Android app for a better experience.</p>
+            <div class="modal-actions">
+                <button onclick="closeModal()" class="btn btn--secondary">Later</button>
+                <a href="{{ url_for('static', filename='PSG Bunker.apk') }}" class="btn btn--primary"
+                    onclick="closeModal()" download>Download Now</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user has already seen the popup
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!localStorage.getItem('appPopupSeen')) {
+                setTimeout(function () {
+                    document.getElementById('downloadModal').classList.add('show');
+                }, 2000); // Show after 2 seconds
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('downloadModal').classList.remove('show');
+            localStorage.setItem('appPopupSeen', 'true');
+        }
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
 </body>
+
 </html>
