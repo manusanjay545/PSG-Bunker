@@ -2,431 +2,432 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
+    <meta charset="UTF-8" />
 
-  <title>PSG Bunker – Attendance & CGPA Tracker</title>
+    <title>PSG Bunker – Attendance & CGPA Tracker</title>
 
-  <meta
-    name="description"
-    content="PSG Bunker is a student dashboard to track attendance and CGPA with a clean dark UI."
-  />
+    <meta name="description"
+        content="PSG Bunker is a student dashboard to track attendance and CGPA with a clean dark UI." />
 
-  <meta name="robots" content="index, follow" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <style>
-    /* Dark Theme - Mobile Optimized with Instagram Image and Gradient Text */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    body {
-        background-color: #1a1a1a;
-        color: #ffffff;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        line-height: 1.6;
-        font-size: 16px;
-        min-height: 100vh;
-    }
-
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-
-    /* Typography */
-    h1 {
-        font-size: 2rem;
-        text-align: center;
-        margin-bottom: 1rem;
-        color: #4a9eff;
-    }
-
-    h2 {
-        font-size: 1.5rem;
-        margin: 2rem 0 1rem 0;
-        color: #ffffff;
-        border-bottom: 2px solid #333;
-        padding-bottom: 0.5rem;
-    }
-
-    /* Login Page Styles */
-    .login-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-    }
-
-    .login-box {
-        background-color: #2a2a2a;
-        border-radius: 12px;
-        padding: 2rem;
-        width: 100%;
-        max-width: 400px;
-        border: 1px solid #333;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .logo-section {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .logo-circle {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #4a9eff, #3a8eef);
-        border-radius: 50%;
-        margin: 0 auto 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-    }
-
-    .logo-text {
-        color: white;
-        font-weight: bold;
-    }
-
-    .app-title {
-        font-size: 2.2rem;
-        font-weight: bold;
-        background: linear-gradient(135deg, #4a9eff, #3a8eef);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 0.5rem;
-    }
-
-    .app-subtitle {
-        color: #cccccc;
-        font-size: 1rem;
-        margin-bottom: 0;
-    }
-
-    /* Form Styles */
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #cccccc;
-        font-weight: 500;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #444;
-        border-radius: 6px;
-        background-color: #1a1a1a;
-        color: #ffffff;
-        font-size: 1rem;
-        transition: border-color 0.3s ease;
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: #4a9eff;
-        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
-    }
-
-    .btn {
-        border: none;
-        border-radius: 6px;
-        padding: 0.75rem 1.5rem;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
-        font-weight: 600;
-    }
-
-    .btn--primary {
-        background: linear-gradient(135deg, #4a9eff, #3a8eef);
-        color: #ffffff;
-    }
-
-    .btn--primary:hover {
-        background: linear-gradient(135deg, #3a8eef, #2a7edf);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(74, 158, 255, 0.3);
-    }
-
-    .btn--secondary {
-        background: #f44336;
-        color: white;
-    }
-
-    .btn--secondary:hover {
-        background: #d32f2f;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(244, 67, 54, 0.3);
-    }
-
-    .btn--gradient {
-        background: linear-gradient(135deg, #4a9eff, #3a8eef);
-        color: white;
-        border: none;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .btn--gradient:hover {
-        background: linear-gradient(135deg, #3a8eef, #2a7edf);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
-    }
-
-    .login-btn {
-        width: 100%;
-        padding: 1rem;
-        font-size: 1.1rem;
-        font-weight: bold;
-    }
-
-    /* Instagram Icon and Gradient Text Styles */
-    .instagram-icon {
-        width: 20px;
-        height: 20px;
-        margin-right: 8px;
-        vertical-align: middle;
-        border-radius: 4px;
-        transition: transform 0.3s ease, filter 0.3s ease;
-        object-fit: cover;
-    }
-
-    .instagram-fallback {
-        margin-right: 8px;
-        vertical-align: middle;
-        font-size: 18px;
-    }
-
-    .social-link {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 0.5rem;
-    }
-
-    .social-link:hover .instagram-icon {
-        transform: scale(1.1) rotate(5deg);
-        filter: brightness(1.1);
-    }
-
-    .instagram-handle {
-        background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        color: #f9ce34;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-
-    .instagram-handle:hover {
-        transform: translateY(-1px);
-        text-shadow: 0 2px 8px rgba(249, 206, 52, 0.3);
-    }
-
-    @supports not (-webkit-background-clip: text) {
-        .instagram-handle {
-            color: #f9ce34;
+    <style>
+        /* Dark Theme - Mobile Optimized with Instagram Image and Gradient Text */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    }
 
-    .login-footer {
-        text-align: center;
-        margin-top: 2rem;
-        padding-top: 1rem;
-        border-top: 1px solid #333;
-        color: #888;
-        font-size: 0.9rem;
-    }
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            font-size: 16px;
+            min-height: 100vh;
+        }
 
-    /* Error Message */
-    .error-message {
-        background-color: rgba(244, 67, 54, 0.2);
-        border: 1px solid #f44336;
-        color: #f44336;
-        padding: 1rem;
-        border-radius: 6px;
-        margin-bottom: 1.5rem;
-        text-align: center;
-    }
-
-    /* Download Button Styles */
-    .download-btn {
-        margin-bottom: 1rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: auto;
-        min-width: 200px;
-        text-decoration: none;
-        gap: 10px;
-    }
-
-    .btn-icon {
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-    }
-
-    /* Modal Styles */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(5px);
-    }
-
-    .modal-overlay.show {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .modal-content {
-        background-color: #2a2a2a;
-        padding: 2rem;
-        border-radius: 16px;
-        width: 90%;
-        max-width: 400px;
-        text-align: center;
-        position: relative;
-        border: 1px solid #444;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        transform: translateY(20px);
-        transition: transform 0.3s ease;
-    }
-
-    .modal-overlay.show .modal-content {
-        transform: translateY(0);
-    }
-
-    .close-modal {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        background: none;
-        border: none;
-        color: #888;
-        font-size: 1.5rem;
-        cursor: pointer;
-        padding: 5px;
-        line-height: 1;
-    }
-
-    .close-modal:hover {
-        color: #fff;
-    }
-
-    .modal-icon-container {
-        margin-bottom: 1rem;
-        display: flex;
-        justify-content: center;
-    }
-
-    .modal-app-icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal-content h2 {
-        color: #fff;
-        margin-bottom: 0.5rem;
-        font-size: 1.5rem;
-        border: none;
-        padding: 0;
-    }
-
-    .modal-content p {
-        color: #ccc;
-        margin-bottom: 1.5rem;
-    }
-
-    .modal-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-    }
-
-    .modal-actions .btn {
-        flex: 1;
-    }
-
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
         .container {
-            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
+        /* Typography */
         h1 {
-            font-size: 1.75rem;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #4a9eff;
         }
 
         h2 {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+            color: #ffffff;
+            border-bottom: 2px solid #333;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
         }
 
         .login-box {
-            margin: 1rem;
-            padding: 1.5rem;
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-    }
 
-    @media (max-width: 480px) {
-        body {
-            font-size: 14px;
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        h1 {
-            font-size: 1.5rem;
+        .logo-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4a9eff, #3a8eef);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .logo-text {
+            color: white;
+            font-weight: bold;
         }
 
         .app-title {
-            font-size: 1.8rem;
+            font-size: 2.2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4a9eff, #3a8eef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
         }
 
+        .app-subtitle {
+            color: #cccccc;
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #cccccc;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4a9eff;
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+        }
+
+        .btn {
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .btn--primary {
+            background: linear-gradient(135deg, #4a9eff, #3a8eef);
+            color: #ffffff;
+        }
+
+        .btn--primary:hover {
+            background: linear-gradient(135deg, #3a8eef, #2a7edf);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.3);
+        }
+
+        .btn--secondary {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn--secondary:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn--gradient {
+            background: linear-gradient(135deg, #4a9eff, #3a8eef);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn--gradient:hover {
+            background: linear-gradient(135deg, #3a8eef, #2a7edf);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* Instagram Icon and Gradient Text Styles */
         .instagram-icon {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+            border-radius: 4px;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            object-fit: cover;
+        }
+
+        .instagram-fallback {
+            margin-right: 8px;
+            vertical-align: middle;
+            font-size: 18px;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .social-link:hover .instagram-icon {
+            transform: scale(1.1) rotate(5deg);
+            filter: brightness(1.1);
+        }
+
+        .instagram-handle {
+            background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: #f9ce34;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .instagram-handle:hover {
+            transform: translateY(-1px);
+            text-shadow: 0 2px 8px rgba(249, 206, 52, 0.3);
+        }
+
+        @supports not (-webkit-background-clip: text) {
+            .instagram-handle {
+                color: #f9ce34;
+            }
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #333;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Error Message */
+        .error-message {
+            background-color: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #f44336;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Download Button Styles */
+        .download-btn {
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            min-width: 200px;
+            text-decoration: none;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
         }
 
         .modal-content {
-            padding: 1.5rem;
+            background-color: #2a2a2a;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            border: 1px solid #444;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .modal-icon-container {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .modal-app-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h2 {
+            color: #fff;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            border: none;
+            padding: 0;
+        }
+
+        .modal-content p {
+            color: #ccc;
+            margin-bottom: 1.5rem;
         }
 
         .modal-actions {
-            flex-direction: column;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
         }
-    }
-  </style>
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+
+            .login-box {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 14px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .app-title {
+                font-size: 1.8rem;
+            }
+
+            .instagram-icon {
+                width: 18px;
+                height: 18px;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 
 
