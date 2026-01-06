@@ -123,6 +123,23 @@ def dashboard():
 def favicon():
     return send_from_directory('static', 'favicon.ico')
 
+@app.route('/download/app')
+def download_apk():
+    """Dedicated route for APK download with proper MIME type and headers"""
+    response = send_from_directory(
+        'static',
+        'PSGBunker.apk',
+        mimetype='application/vnd.android.package-archive',
+        as_attachment=True,
+        download_name='PSGBunker.apk'
+    )
+    # Add headers to prevent caching issues and ensure proper download
+    response.headers['Content-Disposition'] = 'attachment; filename=PSGBunker.apk'
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 @app.route('/sitemap.xml')
 def sitemap():
     """Generate dynamic sitemap for SEO"""
