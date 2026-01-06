@@ -34,11 +34,11 @@
                             </svg>
                             Share App
                         </button>
-                        <a href="/download/app" class="btn btn--gradient download-btn-dashboard" download>
+                        <button onclick="downloadApp()" class="btn btn--gradient download-btn-dashboard">
                             <img src="{{ url_for('static', filename='favicon.ico') }}" alt="App Icon"
                                 class="btn-icon-small">
                             Download App
-                        </a>
+                        </button>
                         <a href="/" class="btn btn--secondary logout-btn">Logout</a>
                     </div>
                 </div>
@@ -194,6 +194,13 @@
         window.onload = function () {
             alert("This website shows you how many classes you can miss ('bunk') while ensuring your physical attendance stays above 75%.");
         };
+
+        // ====== APK DOWNLOAD URL ======
+        const APK_DOWNLOAD_URL = 'https://raw.githubusercontent.com/manusanjay545/PSG-Bunker/e8a1df3d537392a5e17a20b55fb472bc0aec02c2/static/PSGBunker.apk';
+
+        function downloadApp() {
+            window.open(APK_DOWNLOAD_URL, '_blank');
+        }
     </script>
 </body>
 
