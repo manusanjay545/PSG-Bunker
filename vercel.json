@@ -1,0 +1,31 @@
+{
+    "builds": [
+        {
+            "src": "app.py",
+            "use": "@vercel/python"
+        },
+        {
+            "src": "static/**",
+            "use": "@vercel/static"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/download/app",
+            "dest": "/static/PSGBunker.apk",
+            "headers": {
+                "Content-Type": "application/vnd.android.package-archive",
+                "Content-Disposition": "attachment; filename=PSGBunker.apk",
+                "Cache-Control": "public, max-age=31536000"
+            }
+        },
+        {
+            "src": "/static/(.*)",
+            "dest": "/static/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "app.py"
+        }
+    ]
+}
