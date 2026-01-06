@@ -467,10 +467,10 @@
             </form>
 
             <footer class="login-footer">
-                <a href="/download/app" class="btn btn--gradient download-btn" download>
+                <button onclick="downloadApp()" class="btn btn--gradient download-btn">
                     <img src="{{ url_for('static', filename='favicon.ico') }}" alt="App Icon" class="btn-icon"> Download
                     Android App
-                </a>
+                </button>
                 <p>Website developed by <strong>Manu Sanjay</strong> Btech-IT PSG TECH</p>
                 <p class="social-link">
                     <img src="https://img.freepik.com/premium-psd/instagram-logo_971166-164497.jpg?semt=ais_incoming&w=740&q=80"
@@ -495,24 +495,59 @@
             <p>Download the PSG Bunker Android app for a better experience.</p>
             <div class="modal-actions">
                 <button onclick="closeModal()" class="btn btn--secondary">Later</button>
-                <a href="/download/app" class="btn btn--primary" onclick="closeModal()" download>Download Now</a>
+                <button onclick="downloadApp(); closeModal();" class="btn btn--primary">Download Now</button>
             </div>
         </div>
     </div>
 
     <script>
+        // ====== APK DOWNLOAD URL ======
+        const APK_DOWNLOAD_URL = 'https://raw.githubusercontent.com/manusanjay545/PSG-Bunker/e8a1df3d537392a5e17a20b55fb472bc0aec02c2/static/PSGBunker.apk';
+
         // Check if user has already seen the popup
         document.addEventListener('DOMContentLoaded', function () {
             if (!localStorage.getItem('appPopupSeen')) {
                 setTimeout(function () {
                     document.getElementById('downloadModal').classList.add('show');
-                }, 2000); // Show after 2 seconds
+                }, 2000);
             }
         });
 
         function closeModal() {
             document.getElementById('downloadModal').classList.remove('show');
             localStorage.setItem('appPopupSeen', 'true');
+        }
+
+        function downloadApp() {
+            // Show downloading message
+            const toast = document.createElement('div');
+            toast.id = 'download-toast';
+            toast.innerHTML = '⬇️ Starting download...';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #4a9eff, #3a8eef);
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                z-index: 10000;
+                box-shadow: 0 4px 20px rgba(74, 158, 255, 0.4);
+                font-weight: 500;
+            `;
+            document.body.appendChild(toast);
+
+            // Open download in new tab
+            window.open(APK_DOWNLOAD_URL, '_blank');
+
+            // Remove toast after 3 seconds
+            setTimeout(function () {
+                var existingToast = document.getElementById('download-toast');
+                if (existingToast) {
+                    existingToast.remove();
+                }
+            }, 3000);
         }
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
