@@ -467,8 +467,7 @@
             </form>
 
             <footer class="login-footer">
-                <a href="{{ url_for('static', filename='PSGBunker.apk') }}" class="btn btn--gradient download-btn"
-                    download>
+                <a href="/download/app" class="btn btn--gradient download-btn" download>
                     <img src="{{ url_for('static', filename='favicon.ico') }}" alt="App Icon" class="btn-icon"> Download
                     Android App
                 </a>
@@ -496,8 +495,7 @@
             <p>Download the PSG Bunker Android app for a better experience.</p>
             <div class="modal-actions">
                 <button onclick="closeModal()" class="btn btn--secondary">Later</button>
-                <a href="{{ url_for('static', filename='PSGBunker.apk') }}" class="btn btn--primary"
-                    onclick="closeModal()" download>Download Now</a>
+                <a href="/download/app" class="btn btn--primary" onclick="closeModal()" download>Download Now</a>
             </div>
         </div>
     </div>
