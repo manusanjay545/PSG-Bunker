@@ -56,11 +56,21 @@
         </section>
 
         <section class="attendance-section">
-            <h2>📚 Subject-wise Attendance</h2>
+            <div class="attendance-header">
+                <h2>📚 Subject-wise Attendance</h2>
+                <div class="percentage-toggle">
+                    <span class="toggle-label">Percentage</span>
+                    <div class="toggle-switch">
+                        <button id="btn75" class="toggle-btn active" onclick="setThreshold(75)">75%</button>
+                        <button id="btn80" class="toggle-btn" onclick="setThreshold(80)">80%</button>
+                    </div>
+                </div>
+            </div>
             <div class="subjects-grid">
                 {% for subject in attendance %}
-                <div
-                    class="subject-card {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
+                <div class="subject-card {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}"
+                    data-total="{{ subject.total_hours }}" data-present="{{ subject.total_present }}"
+                    data-percentage="{{ subject.percentage_of_attendance }}">
                     <div class="subject-title">{{ subject.course_title }}</div>
                     <div class="course-code">{{ subject.name }}</div>
 
@@ -82,8 +92,8 @@
                                 <span class="status-number status-must-attend">{{ subject.class_to_attend }}</span>
                                 <div class="status-label status-must-attend">Must Attend</div>
                                 {% else %}
-                                <img src="https://media.tenor.com/ygZQDXMkWxcAAAAM/steve-harrington.gif"
-                                    alt="Party" class="status-gif">
+                                <img src="https://media.tenor.com/ygZQDXMkWxcAAAAM/steve-harrington.gif" alt="Party"
+                                    class="status-gif">
                                 <span class="status-number status-can-miss">{{ subject.class_to_bunk }}</span>
                                 <div class="status-label status-can-miss">Can Bunk</div>
                                 {% endif %}
@@ -189,17 +199,73 @@
         document.head.appendChild(style);
     </script>
 
-    <!-- Popup message on page load -->
     <script>
-        window.onload = function () {
-            alert("This website shows you how many classes you can miss ('bunk') while ensuring your physical attendance stays above 75%.");
-        };
-
         // ====== APK DOWNLOAD URL ======
         const APK_DOWNLOAD_URL = 'https://github.com/manusanjay545/PSG-Bunker/raw/main/static/PSGBunker.apk';
 
         function downloadApp() {
             window.open(APK_DOWNLOAD_URL, '_blank');
+        }
+
+        // ====== PERCENTAGE TOGGLE ======
+        let currentThreshold = 75;
+
+        function setThreshold(value) {
+            currentThreshold = value;
+
+            // Update toggle buttons
+            document.getElementById('btn75').classList.toggle('active', value === 75);
+            document.getElementById('btn80').classList.toggle('active', value === 80);
+
+            // Recalculate all subject cards
+            const cards = document.querySelectorAll('.subject-card');
+            cards.forEach(card => {
+                const totalHours = parseInt(card.dataset.total);
+                const totalPresent = parseInt(card.dataset.present);
+                const percentage = parseFloat(card.dataset.percentage);
+                const threshold = value / 100;
+
+                const statusDisplay = card.querySelector('.status-display');
+
+                // Determine card border color class
+                card.classList.remove('success', 'warning', 'danger');
+                if (percentage >= 85) {
+                    card.classList.add('success');
+                } else if (percentage >= value) {
+                    card.classList.add('warning');
+                } else {
+                    card.classList.add('danger');
+                }
+
+                // Update percentage number color
+                const percNum = card.querySelector('.percentage-number');
+                percNum.classList.remove('success', 'warning', 'danger');
+                if (percentage >= 85) {
+                    percNum.classList.add('success');
+                } else if (percentage >= value) {
+                    percNum.classList.add('warning');
+                } else {
+                    percNum.classList.add('danger');
+                }
+
+                if (percentage < value) {
+                    // Must attend
+                    const mustAttend = Math.ceil((threshold * totalHours - totalPresent) / (1 - threshold));
+                    statusDisplay.innerHTML = `
+                        <img src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyN2JsOGVwbzRxanBkbnQ3bHB1OG1uOGRjYXVsdWo2eWVsNGxvbDRzciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/98MaHVwJOmWMz4cz1K/200.gif" alt="Stress" class="status-gif">
+                        <span class="status-number status-must-attend">${mustAttend}</span>
+                        <div class="status-label status-must-attend">Must Attend</div>
+                    `;
+                } else {
+                    // Can bunk
+                    const canBunk = Math.floor((totalPresent - threshold * totalHours) / threshold);
+                    statusDisplay.innerHTML = `
+                        <img src="https://media.tenor.com/ygZQDXMkWxcAAAAM/steve-harrington.gif" alt="Party" class="status-gif">
+                        <span class="status-number status-can-miss">${canBunk}</span>
+                        <div class="status-label status-can-miss">Can Bunk</div>
+                    `;
+                }
+            });
         }
     </script>
 </body>
