@@ -864,3 +864,195 @@ h2 {
         font-size: 0.85rem;
     }
 }
+
+/* ===== Timetable Section ===== */
+.timetable-section {
+    margin-top: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.timetable-wrapper {
+    background-color: #2a2a2a;
+    border-radius: 12px;
+    border: 1px solid #333;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.timetable-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.timetable-scroll::-webkit-scrollbar {
+    height: 8px;
+}
+
+.timetable-scroll::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 4px;
+}
+
+.timetable-scroll::-webkit-scrollbar-thumb {
+    background: #4a9eff;
+    border-radius: 4px;
+}
+
+.timetable-scroll::-webkit-scrollbar-thumb:hover {
+    background: #3a8eef;
+}
+
+.timetable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 600px;
+    font-size: 0.9rem;
+}
+
+.timetable thead th {
+    background: linear-gradient(135deg, #4a9eff, #3a8eef);
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.85rem 1rem;
+    text-align: center;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    font-size: 0.8rem;
+}
+
+.timetable thead th:first-child {
+    border-radius: 0;
+    text-align: left;
+    padding-left: 1.25rem;
+}
+
+.timetable tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.timetable tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.timetable tbody tr:hover {
+    background-color: rgba(74, 158, 255, 0.08);
+}
+
+.timetable tbody td {
+    padding: 0.75rem 0.85rem;
+    text-align: center;
+    border-bottom: 1px solid #333;
+    color: #ddd;
+    font-size: 0.85rem;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.timetable tbody td.day-cell {
+    font-weight: 700;
+    color: #4a9eff;
+    text-align: left;
+    padding-left: 1.25rem;
+    background-color: rgba(74, 158, 255, 0.06);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    min-width: 80px;
+}
+
+.timetable tbody td.has-class {
+    color: #fff;
+    font-weight: 500;
+    background-color: rgba(74, 158, 255, 0.04);
+}
+
+.timetable tbody td.empty-cell {
+    color: #555;
+}
+
+/* Attendance-based timetable cell colors */
+.timetable tbody td.tt-success {
+    background-color: rgba(76, 175, 80, 0.18);
+    color: #81c784;
+    font-weight: 600;
+    border-left: 2px solid rgba(76, 175, 80, 0.4);
+}
+
+.timetable tbody td.tt-warning {
+    background-color: rgba(255, 152, 0, 0.18);
+    color: #ffb74d;
+    font-weight: 600;
+    border-left: 2px solid rgba(255, 152, 0, 0.4);
+}
+
+.timetable tbody td.tt-danger {
+    background-color: rgba(244, 67, 54, 0.18);
+    color: #e57373;
+    font-weight: 600;
+    border-left: 2px solid rgba(244, 67, 54, 0.4);
+}
+
+.timetable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* No timetable fallback */
+.no-timetable {
+    background-color: #2a2a2a;
+    border: 1px dashed #444;
+    border-radius: 12px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    color: #888;
+    font-size: 1rem;
+    margin-top: 1rem;
+}
+
+.no-timetable p {
+    margin: 0;
+}
+
+/* Timetable mobile responsive */
+@media (max-width: 768px) {
+    .timetable {
+        font-size: 0.8rem;
+        min-width: 500px;
+    }
+
+    .timetable thead th {
+        padding: 0.7rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .timetable tbody td {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.78rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .timetable {
+        font-size: 0.75rem;
+        min-width: 450px;
+    }
+
+    .timetable thead th {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.7rem;
+    }
+
+    .timetable tbody td {
+        padding: 0.5rem 0.4rem;
+        font-size: 0.72rem;
+    }
+
+    .timetable-section {
+        margin-top: 1.5rem;
+    }
+}
