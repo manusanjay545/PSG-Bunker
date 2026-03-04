@@ -3,7 +3,7 @@ import math
 from datetime import datetime
 import xml.etree.ElementTree as ET
 from flask import Flask, render_template, request, jsonify, session as flask_session, send_from_directory, redirect, Response
-from bunker_mod import return_attendance, data_json, return_cgpa, get_course_plan
+from bunker_mod import return_attendance, data_json, return_cgpa, get_course_plan, get_timetable
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'psg-bunker-secret-key-change-in-production')
@@ -41,6 +41,9 @@ def login():
     # Get real course plan data with course titles
     course_plan = get_course_plan(session)
 
+    # Get timetable data
+    timetable_data = get_timetable(session)
+
     # Process attendance data with real course names from courseplan
     attendance_data = data_json(attendance_raw, course_plan)
     cgpa_data = return_cgpa(session)
@@ -49,7 +52,13 @@ def login():
     flask_session['attendance_data'] = attendance_data
     flask_session['cgpa_data'] = cgpa_data
     flask_session['course_plan'] = course_plan
+    flask_session['timetable_data'] = timetable_data
     flask_session['rollno'] = rollno
+
+    # Build attendance lookup for timetable cell coloring
+    attendance_lookup = {}
+    for subject in attendance_data:
+        attendance_lookup[subject['name']] = subject['percentage_of_attendance']
 
     if request.is_json:
         return jsonify({"ok": True})
@@ -57,7 +66,9 @@ def login():
         return render_template("dashboard.html",
                              rollno=rollno,
                              attendance=attendance_data,
-                             cgpa=cgpa_data)
+                             cgpa=cgpa_data,
+                             timetable=timetable_data,
+                             attendance_lookup=attendance_lookup)
 
 @app.route('/attendance')
 def get_attendance():
@@ -114,10 +125,18 @@ def dashboard():
     if 'rollno' not in flask_session:
         return redirect('/')
 
+    # Build attendance lookup for timetable cell coloring
+    attendance_data = flask_session.get('attendance_data', [])
+    attendance_lookup = {}
+    for subject in attendance_data:
+        attendance_lookup[subject['name']] = subject['percentage_of_attendance']
+
     return render_template("dashboard.html",
                          rollno=flask_session['rollno'],
-                         attendance=flask_session.get('attendance_data', []),
-                         cgpa=flask_session.get('cgpa_data', {}))
+                         attendance=attendance_data,
+                         cgpa=flask_session.get('cgpa_data', {}),
+                         timetable=flask_session.get('timetable_data', {'headers': [], 'rows': []}),
+                         attendance_lookup=attendance_lookup)
 
 @app.route('/favicon.ico')
 def favicon():
