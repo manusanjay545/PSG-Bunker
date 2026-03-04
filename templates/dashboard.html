@@ -109,6 +109,55 @@
             </div>
         </section>
 
+        <section class="timetable-section">
+            <h2>🗓️ Weekly Timetable</h2>
+            {% if timetable and timetable.headers %}
+            <div class="timetable-wrapper">
+                <div class="timetable-scroll">
+                    <table class="timetable" id="timetableGrid">
+                        <thead>
+                            <tr>
+                                {% for header in timetable.headers %}
+                                <th>{{ header }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in timetable.rows %}
+                            <tr>
+                                {% for cell in row %}
+                                {% if loop.index0 == 0 %}
+                                <td class="day-cell">{{ cell }}</td>
+                                {% elif cell %}
+                                {% set cell_trimmed = cell.strip().split('\n')[0].strip().split(' ')[0].strip() %}
+                                {% set att_pct = attendance_lookup.get(cell_trimmed, attendance_lookup.get(cell.strip(),
+                                -1)) %}
+                                {% if att_pct >= 85 %}
+                                <td class="has-class tt-success">{{ cell }}</td>
+                                {% elif att_pct >= 75 %}
+                                <td class="has-class tt-warning">{{ cell }}</td>
+                                {% elif att_pct >= 0 %}
+                                <td class="has-class tt-danger">{{ cell }}</td>
+                                {% else %}
+                                <td class="has-class">{{ cell }}</td>
+                                {% endif %}
+                                {% else %}
+                                <td class="empty-cell">{{ cell }}</td>
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-timetable">
+                <p>📭 Timetable data is not available at the moment.</p>
+            </div>
+            {% endif %}
+        </section>
+
         <footer class="dashboard-footer">
             <p>Website developed by <strong>Manu Sanjay</strong> Btech-IT PSG TECH</p>
             <p class="social-link">
