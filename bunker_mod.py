@@ -78,6 +78,64 @@ def get_course_plan(session):
     except:
         return {}
 
+def get_timetable(session):
+    """Get full weekly timetable from the timetable page"""
+    try:
+        timetable_url = "https://ecampus.psgtech.ac.in/studzone2/AttWfStudTimtab.aspx"
+        page = session.get(timetable_url)
+        soup = BeautifulSoup(page.text, 'html.parser')
+
+        # Try to find the timetable grid table (usually has id like TbTimtab or similar)
+        timetable_table = None
+        # Look for tables that contain day names (Mon, Tue, etc.)
+        for table in soup.find_all("table"):
+            table_text = table.get_text()
+            if any(day in table_text for day in ["MON", "TUE", "WED", "THU", "FRI", "Mon", "Tue", "Wed", "Thu", "Fri"]):
+                # Skip the course description table
+                if table.get("id") == "TbCourDesc":
+                    continue
+                timetable_table = table
+                break
+
+        if not timetable_table:
+            return {"headers": [], "rows": []}
+
+        # Extract headers and rows
+        headers = []
+        rows = []
+        all_rows = timetable_table.find_all("tr")
+
+        for i, row in enumerate(all_rows):
+            cells = row.find_all(["th", "td"])
+            cell_texts = [cell.get_text(strip=True) for cell in cells]
+
+            if not any(cell_texts):  # Skip empty rows
+                continue
+
+            # Skip rows that are just a single number (stray row counts from HTML)
+            if len(cell_texts) == 1 and cell_texts[0].isdigit():
+                continue
+
+            # Skip rows with very few cells compared to expected timetable width
+            if headers and len(cell_texts) < 2:
+                continue
+
+            if i == 0 or (not headers and cell_texts):
+                headers = cell_texts
+            else:
+                if any(cell_texts):  # Only add non-empty rows
+                    # Ensure row has the same number of columns as headers
+                    if headers and len(cell_texts) != len(headers):
+                        # Pad or trim to match header length
+                        while len(cell_texts) < len(headers):
+                            cell_texts.append("")
+                        cell_texts = cell_texts[:len(headers)]
+                    rows.append(cell_texts)
+
+        return {"headers": headers, "rows": rows}
+    except:
+        return {"headers": [], "rows": []}
+
 def data_json(data, course_plan=None):
     response = []
     for item in data[1:]:
