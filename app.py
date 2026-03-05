@@ -44,8 +44,11 @@ def login():
     # Get timetable data
     timetable_data = get_timetable(session)
 
+    # Check if attendance data is available
+    attendance_unavailable = (len(attendance_raw) == 0)
+
     # Process attendance data with real course names from courseplan
-    attendance_data = data_json(attendance_raw, course_plan)
+    attendance_data = data_json(attendance_raw, course_plan) if not attendance_unavailable else []
     cgpa_data = return_cgpa(session)
 
     # Store data in Flask session for API endpoints
@@ -54,6 +57,7 @@ def login():
     flask_session['course_plan'] = course_plan
     flask_session['timetable_data'] = timetable_data
     flask_session['rollno'] = rollno
+    flask_session['attendance_unavailable'] = attendance_unavailable
 
     # Build attendance lookup for timetable cell coloring
     attendance_lookup = {}
@@ -68,7 +72,8 @@ def login():
                              attendance=attendance_data,
                              cgpa=cgpa_data,
                              timetable=timetable_data,
-                             attendance_lookup=attendance_lookup)
+                             attendance_lookup=attendance_lookup,
+                             attendance_unavailable=attendance_unavailable)
 
 @app.route('/attendance')
 def get_attendance():
@@ -136,7 +141,8 @@ def dashboard():
                          attendance=attendance_data,
                          cgpa=flask_session.get('cgpa_data', {}),
                          timetable=flask_session.get('timetable_data', {'headers': [], 'rows': []}),
-                         attendance_lookup=attendance_lookup)
+                         attendance_lookup=attendance_lookup,
+                         attendance_unavailable=flask_session.get('attendance_unavailable', False))
 
 @app.route('/favicon.ico')
 def favicon():
