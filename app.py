@@ -62,7 +62,12 @@ def login():
     # Build attendance lookup for timetable cell coloring
     attendance_lookup = {}
     for subject in attendance_data:
-        attendance_lookup[subject['name']] = subject['percentage_of_attendance']
+        name = subject['name']
+        pct = subject['percentage_of_attendance']
+        attendance_lookup[name] = pct
+        # Also add with "BT " prefix for timetable matching
+        if not name.startswith('BT '):
+            attendance_lookup['BT ' + name] = pct
 
     if request.is_json:
         return jsonify({"ok": True})
@@ -134,7 +139,11 @@ def dashboard():
     attendance_data = flask_session.get('attendance_data', [])
     attendance_lookup = {}
     for subject in attendance_data:
-        attendance_lookup[subject['name']] = subject['percentage_of_attendance']
+        name = subject['name']
+        pct = subject['percentage_of_attendance']
+        attendance_lookup[name] = pct
+        if not name.startswith('BT '):
+            attendance_lookup['BT ' + name] = pct
 
     return render_template("dashboard.html",
                          rollno=flask_session['rollno'],
