@@ -36,7 +36,14 @@ def return_attendance(username, pwd):
             "abcd3": "Login"
         }
 
-        session.post(login_url, data=payload, headers=headers)
+        login_response = session.post(login_url, data=payload, headers=headers)
+
+        # Check if login failed (page still shows login form means invalid password)
+        login_soup = BeautifulSoup(login_response.text, 'html.parser')
+        login_error = login_soup.find("span", {"id": "lblStatus"})
+        # If login form fields are still present, login failed
+        if login_soup.find("input", {"name": "txtusercheck"}) and login_soup.find("input", {"name": "txtpwdcheck"}):
+            return "Invalid Password"
 
         # Get attendance
         attendance_url = "https://ecampus.psgtech.ac.in/studzone2/AttWfPercView.aspx"
@@ -45,7 +52,8 @@ def return_attendance(username, pwd):
 
         table = soup.find("table", {"class": "cssbody"})
         if not table:
-            return "Attendance data is updatng try again later or invalid password"
+            # Login succeeded but attendance data is not available
+            return [], session
 
         data = []
         for row in table.find_all("tr"):
