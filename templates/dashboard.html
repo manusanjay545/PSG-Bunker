@@ -67,7 +67,8 @@
                 </div>
             </div>
             {% if attendance_unavailable %}
-            <div class="attendance-updating-msg" style="background-color: rgba(255, 165, 0, 0.15); border: 1px solid #ffa500; color: #ffa500; padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0; font-size: 1.1rem; font-weight: 500;">
+            <div class="attendance-updating-msg"
+                style="background-color: rgba(255, 165, 0, 0.15); border: 1px solid #ffa500; color: #ffa500; padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0; font-size: 1.1rem; font-weight: 500;">
                 ⚠️ Attendance is Updating, Please try again later
             </div>
             {% endif %}
@@ -136,18 +137,7 @@
                                 {% if loop.index0 == 0 %}
                                 <td class="day-cell">{{ cell }}</td>
                                 {% elif cell %}
-                                {% set cell_trimmed = cell.strip().split('\n')[0].strip().split(' ')[0].strip() %}
-                                {% set att_pct = attendance_lookup.get(cell_trimmed, attendance_lookup.get(cell.strip(),
-                                -1)) %}
-                                {% if att_pct >= 85 %}
-                                <td class="has-class tt-success">{{ cell }}</td>
-                                {% elif att_pct >= 75 %}
-                                <td class="has-class tt-warning">{{ cell }}</td>
-                                {% elif att_pct >= 0 %}
-                                <td class="has-class tt-danger">{{ cell }}</td>
-                                {% else %}
-                                <td class="has-class">{{ cell }}</td>
-                                {% endif %}
+                                <td class="has-class" data-subject="{{ cell.strip() }}">{{ cell }}</td>
                                 {% else %}
                                 <td class="empty-cell">{{ cell }}</td>
                                 {% endif %}
@@ -170,7 +160,7 @@
             <p class="social-link">
                 <img src="https://img.freepik.com/premium-psd/instagram-logo_971166-164497.jpg?semt=ais_incoming&w=740&q=80"
                     alt="Instagram" class="instagram-icon"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                    onerror="this.style.display=' none'; this.nextElementSibling.style.display='inline' ;">
                 <span class="instagram-fallback" style="display: none;">📷</span>
                 <a href="https://instagram.com/manu_sanjay.m" target="_blank"
                     class="instagram-handle">@manu_sanjay.m</a>
@@ -323,6 +313,76 @@
                 }
             });
         }
+    </script>
+
+    <script>
+        // ====== TIMETABLE CELL COLORING ======
+        (function () {
+            const attendanceLookup = {{ attendance_lookup | tojson
+        }};
+
+        // Normalize a code string for flexible matching
+        function normalize(str) {
+            return str.replace(/\s+/g, '').replace(/_/g, '').toLowerCase();
+        }
+
+        // Build normalized lookup
+        const normalizedLookup = {};
+        for (const [key, pct] of Object.entries(attendanceLookup)) {
+            normalizedLookup[normalize(key)] = pct;
+        }
+
+        // Format display text: add space after semester digit (first digit after _)
+        function formatDisplay(text) {
+            return text.replace(/(_\d)(\d)/g, '$1 $2');
+        }
+
+        // Find attendance percentage for a cell
+        function findAttendance(cellText) {
+            const clean = cellText.trim().split('\n')[0].trim();
+            // Try exact match
+            if (attendanceLookup[clean] !== undefined) return attendanceLookup[clean];
+            // Try without "BT " prefix
+            const noPre = clean.startsWith('BT ') ? clean.slice(3) : clean;
+            if (attendanceLookup[noPre] !== undefined) return attendanceLookup[noPre];
+            // Try last token
+            const last = clean.split(' ').pop();
+            if (attendanceLookup[last] !== undefined) return attendanceLookup[last];
+            // Try normalized matching
+            const norm = normalize(clean);
+            if (normalizedLookup[norm] !== undefined) return normalizedLookup[norm];
+            const normNoPre = normalize(noPre);
+            if (normalizedLookup[normNoPre] !== undefined) return normalizedLookup[normNoPre];
+            const normLast = normalize(last);
+            if (normalizedLookup[normLast] !== undefined) return normalizedLookup[normLast];
+            // Try if any attendance key is contained in cell text or vice versa
+            for (const [key, pct] of Object.entries(attendanceLookup)) {
+                if (clean.includes(key) || key.includes(clean) ||
+                    noPre.includes(key) || key.includes(noPre) ||
+                    last.includes(key) || key.includes(last)) {
+                    return pct;
+                }
+            }
+            return -1;
+        }
+
+        // Color all timetable cells
+        document.querySelectorAll('#timetableGrid td.has-class[data-subject]').forEach(function (td) {
+            const subject = td.getAttribute('data-subject');
+            if (!subject) return;
+            const pct = findAttendance(subject);
+            // Format display text
+            td.textContent = formatDisplay(td.textContent.trim());
+            // Apply color class
+            if (pct >= 85) {
+                td.classList.add('tt-success');
+            } else if (pct >= 75) {
+                td.classList.add('tt-warning');
+            } else if (pct >= 0) {
+                td.classList.add('tt-danger');
+            }
+        });
+        }) ();
     </script>
 </body>
 
