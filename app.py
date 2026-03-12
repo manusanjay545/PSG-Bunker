@@ -3,7 +3,7 @@ import math
 from datetime import datetime
 import xml.etree.ElementTree as ET
 from flask import Flask, render_template, request, jsonify, session as flask_session, send_from_directory, redirect, Response
-from bunker_mod import return_attendance, data_json, return_cgpa, get_course_plan, get_timetable
+from bunker_mod import return_attendance, data_json, get_course_plan, get_timetable, get_student_name
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'psg-bunker-secret-key-change-in-production')
@@ -36,7 +36,7 @@ def login():
         else:
             return render_template("index.html", error=result)
 
-    attendance_raw, session = result
+    attendance_raw, session, student_name = result
 
     # Get real course plan data with course titles
     course_plan = get_course_plan(session)
@@ -49,14 +49,13 @@ def login():
 
     # Process attendance data with real course names from courseplan
     attendance_data = data_json(attendance_raw, course_plan) if not attendance_unavailable else []
-    cgpa_data = return_cgpa(session)
 
     # Store data in Flask session for API endpoints
     flask_session['attendance_data'] = attendance_data
-    flask_session['cgpa_data'] = cgpa_data
     flask_session['course_plan'] = course_plan
     flask_session['timetable_data'] = timetable_data
     flask_session['rollno'] = rollno
+    flask_session['student_name'] = student_name
     flask_session['attendance_unavailable'] = attendance_unavailable
 
     # Build attendance lookup for timetable cell coloring
@@ -74,8 +73,8 @@ def login():
     else:
         return render_template("dashboard.html",
                              rollno=rollno,
+                             student_name=student_name,
                              attendance=attendance_data,
-                             cgpa=cgpa_data,
                              timetable=timetable_data,
                              attendance_lookup=attendance_lookup,
                              attendance_unavailable=attendance_unavailable)
@@ -117,12 +116,6 @@ def get_attendance():
         "bunkable_days": bunkable_days
     })
 
-@app.route('/cgpa')
-def get_cgpa():
-    """API endpoint for CGPA data"""
-    cgpa_data = flask_session.get('cgpa_data', {})
-    return jsonify(cgpa_data)
-
 @app.route('/courses')
 def get_courses():
     """API endpoint to get course mapping"""
@@ -147,8 +140,8 @@ def dashboard():
 
     return render_template("dashboard.html",
                          rollno=flask_session['rollno'],
+                         student_name=flask_session.get('student_name'),
                          attendance=attendance_data,
-                         cgpa=flask_session.get('cgpa_data', {}),
                          timetable=flask_session.get('timetable_data', {'headers': [], 'rows': []}),
                          attendance_lookup=attendance_lookup,
                          attendance_unavailable=flask_session.get('attendance_unavailable', False))
@@ -223,7 +216,6 @@ Allow: /
 # Block authenticated/API pages
 Disallow: /dashboard
 Disallow: /attendance
-Disallow: /cgpa
 Disallow: /courses
 
 Sitemap: {base_url}/sitemap.xml
