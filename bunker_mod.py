@@ -4,12 +4,40 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
 
-def gradeMap(grade):
-    grade_map = {
-        "O": 10, "A+": 9, "A": 8, "B+": 7, 
-        "B": 6, "C+": 5, "C": 4, "RA": 0, "SA": 0, "W": 0
-    }
-    return grade_map.get(grade.strip().upper(), 0)
+def _extract_name_from_soup(soup):
+    """Helper to find the student name in a BeautifulSoup parsed page"""
+    # Try common label/span IDs where name appears
+    for label_id in ["lblWelcomeStudName", "lblName", "lblStudentName",
+                     "lblWelcome", "lblStudName", "lblstudname",
+                     "Label1", "lbl_StuName", "lbl_stuname"]:
+        elem = soup.find(id=label_id)
+        if elem and elem.get_text(strip=True):
+            name = elem.get_text(strip=True)
+            # Clean up "Welcome, Name" patterns
+            if "welcome" in name.lower():
+                name = name.split(",", 1)[-1].strip().rstrip("!").strip()
+            if name and len(name) > 1 and not name.replace(" ", "").isdigit():
+                return name
+
+    # Search all spans, labels, divs for welcome text with name
+    for tag in soup.find_all(["span", "label", "div", "td"]):
+        text = tag.get_text(strip=True)
+        if not text:
+            continue
+        text_lower = text.lower()
+        if "welcome" in text_lower and len(text) > 8 and len(text) < 100:
+            if "," in text:
+                name = text.split(",", 1)[1].strip().rstrip("!").strip()
+            else:
+                for prefix in ["Welcome ", "welcome ", "WELCOME "]:
+                    if text.startswith(prefix):
+                        name = text[len(prefix):].strip().rstrip("!").strip()
+                        break
+                else:
+                    continue
+            if name and len(name) > 1 and not name.replace(" ", "").isdigit():
+                return name
+    return None
 
 def return_attendance(username, pwd):
     try:
@@ -45,22 +73,29 @@ def return_attendance(username, pwd):
         if login_soup.find("input", {"name": "txtusercheck"}) and login_soup.find("input", {"name": "txtpwdcheck"}):
             return "Invalid Password"
 
+        # Try to extract student name from post-login page
+        student_name = _extract_name_from_soup(login_soup)
+
         # Get attendance
         attendance_url = "https://ecampus.psgtech.ac.in/studzone2/AttWfPercView.aspx"
         page = session.get(attendance_url, headers=headers)
         soup = BeautifulSoup(page.text, 'html.parser')
 
+        # Also try extracting name from attendance page if not found yet
+        if not student_name:
+            student_name = _extract_name_from_soup(soup)
+
         table = soup.find("table", {"class": "cssbody"})
         if not table:
             # Login succeeded but attendance data is not available
-            return [], session
+            return [], session, student_name
 
         data = []
         for row in table.find_all("tr"):
             cols = [ele.text.strip() for ele in row.find_all("td")]
             data.append([ele for ele in cols if ele])
 
-        return data, session
+        return data, session, student_name
 
     except Exception as e:
         return f"Error: {str(e)}"
@@ -85,6 +120,64 @@ def get_course_plan(session):
         return course_mapping
     except:
         return {}
+
+def get_student_name(session):
+    """Get student name from the eCampus portal"""
+    try:
+        # Try multiple pages where the name might appear
+        urls = [
+            "https://ecampus.psgtech.ac.in/studzone2/",
+            "https://ecampus.psgtech.ac.in/studzone2/CAaborali498.aspx",
+            "https://ecampus.psgtech.ac.in/studzone2/AttWfPercView.aspx",
+            "https://ecampus.psgtech.ac.in/studzone2/AttWfStudTimtab.aspx",
+        ]
+
+        for url in urls:
+            try:
+                page = session.get(url, timeout=5)
+                soup = BeautifulSoup(page.text, 'html.parser')
+
+                # Try common label/span IDs where name appears
+                for label_id in ["lblWelcomeStudName", "lblName", "lblStudentName",
+                                 "lblWelcome", "lblStudName", "lblstudname",
+                                 "Label1", "lbl_StuName", "lbl_stuname"]:
+                    elem = soup.find(id=label_id)
+                    if elem and elem.get_text(strip=True):
+                        name = elem.get_text(strip=True)
+                        # Clean up "Welcome, Name" patterns
+                        if "welcome" in name.lower():
+                            name = name.split(",", 1)[-1].strip().rstrip("!").strip()
+                        if name and len(name) > 1 and not name.replace(" ", "").isdigit():
+                            return name
+
+                # Search all spans, labels, divs for welcome text with name
+                for tag in soup.find_all(["span", "label", "div", "td"]):
+                    text = tag.get_text(strip=True)
+                    if not text:
+                        continue
+                    text_lower = text.lower()
+                    # Look for "Welcome, Name" or "Welcome Name" patterns
+                    if "welcome" in text_lower and len(text) > 8 and len(text) < 100:
+                        # Try splitting by comma
+                        if "," in text:
+                            name = text.split(",", 1)[1].strip().rstrip("!").strip()
+                        else:
+                            # Try removing "Welcome" prefix
+                            for prefix in ["Welcome ", "welcome ", "WELCOME "]:
+                                if text.startswith(prefix):
+                                    name = text[len(prefix):].strip().rstrip("!").strip()
+                                    break
+                            else:
+                                continue
+                        if name and len(name) > 1 and not name.replace(" ", "").isdigit():
+                            return name
+
+            except:
+                continue
+
+        return None
+    except:
+        return None
 
 def get_timetable(session):
     """Get full weekly timetable from the timetable page"""
@@ -173,52 +266,3 @@ def data_json(data, course_plan=None):
         response.append(temp)
     return response
 
-def return_cgpa(session):
-    try:
-        # Get results
-        results_url = "https://ecampus.psgtech.ac.in/studzone2/FrmEpsStudResult.aspx"
-        page = session.get(results_url)
-        soup = BeautifulSoup(page.text, 'html.parser')
-
-        table = soup.find("table", {"id": "DgResult"})
-        if not table:
-            return {"error": "No results found"}
-
-        # Process results
-        data = []
-        for row in table.find_all("tr")[1:]:  # Skip header
-            cols = [ele.text.strip() for ele in row.find_all("td")]
-            if len(cols) >= 6:  # Ensure valid row
-                data.append({
-                    "semester": cols[0],
-                    "code": cols[1],
-                    "title": cols[2],
-                    "credits": int(cols[3]),
-                    "grade": cols[4].split()[-1],  # Get last part
-                    "result": cols[5]
-                })
-
-        # Calculate CGPA
-        total_points = 0
-        total_credits = 0
-        latest_sem = ""
-
-        for course in data:
-            if course["credits"] > 0 and course["grade"] in ["O","A+","A","B+","B","C+","C"]:
-                total_points += course["credits"] * gradeMap(course["grade"])
-                total_credits += course["credits"]
-                if course["semester"] > latest_sem:
-                    latest_sem = course["semester"]
-
-        cgpa = total_points / total_credits if total_credits > 0 else 0
-
-        return {
-            "lastest_sem": latest_sem,
-            "latest_sem_cgpa": round(cgpa, 3),
-            "total_cgpa": round(cgpa, 3),
-            "total_semesters": len(set(course["semester"] for course in data)),
-            "courses": data
-        }
-
-    except Exception as e:
-        return {"error": str(e)}
