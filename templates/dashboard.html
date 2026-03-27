@@ -170,6 +170,7 @@
         <footer class="dashboard-footer">
             <p>Website developed by <strong>Manu Sanjay</strong> Btech-IT PSG TECH</p>
             <p class="social-link">
+                <span class="click-text">click 👉:</span>
                 <img src="https://img.freepik.com/premium-psd/instagram-logo_971166-164497.jpg?semt=ais_incoming&w=740&q=80"
                     alt="Instagram" class="instagram-icon"
                     onerror="this.style.display=' none'; this.nextElementSibling.style.display='inline' ;">
@@ -353,7 +354,7 @@
                     `;
                 } else {
                     // Can bunk
-                    const canBunk = Math.floor((totalPresent - threshold * totalHours) / threshold);
+                    const canBunk = Math.max(0, Math.floor((totalPresent - threshold * totalHours) / threshold));
                     const statusInfo = card.querySelector('.status-info');
                     if (statusInfo) {
                         statusInfo.innerHTML = `
