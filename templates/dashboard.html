@@ -117,7 +117,7 @@
             {% if attendance %}
             <div class="subjects-grid">
                 {% for subject in attendance %}
-                <div class="subject-card {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}"
+                <div class="subject-card {% if subject.percentage_of_attendance >= 80 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}"
                     data-total="{{ subject.total_hours }}" data-present="{{ subject.total_present }}"
                     data-percentage="{{ subject.percentage_of_attendance }}"
                     data-percentage-med="{{ subject.percentage_with_medical }}"
@@ -128,7 +128,7 @@
                     <div class="subject-main-info">
                         <div class="attendance-percentage">
                             <span
-                                class="percentage-number {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
+                                class="percentage-number {% if subject.percentage_of_attendance >= 80 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
                                 {{ "%.1f"|format(subject.percentage_of_attendance) }}%
                             </span>
                             <div class="attendance-details">
@@ -306,9 +306,9 @@
 
                 // Determine card border color class
                 card.classList.remove('success', 'warning', 'danger');
-                if (percentage >= 85) {
+                if (percentage >= 80) {
                     card.classList.add('success');
-                } else if (percentage >= value) {
+                } else if (percentage >= 75) {
                     card.classList.add('warning');
                 } else {
                     card.classList.add('danger');
@@ -317,9 +317,9 @@
                 // Update percentage display
                 const percNum = card.querySelector('.percentage-number');
                 percNum.classList.remove('success', 'warning', 'danger');
-                if (percentage >= 85) {
+                if (percentage >= 80) {
                     percNum.classList.add('success');
-                } else if (percentage >= value) {
+                } else if (percentage >= 75) {
                     percNum.classList.add('warning');
                 } else {
                     percNum.classList.add('danger');
@@ -421,16 +421,15 @@
 
         // Color all timetable cells based on the selected threshold
         function colorTimetableCells(threshold) {
-            const successThreshold = threshold + 10;
             document.querySelectorAll('#timetableGrid td.has-class[data-subject]').forEach(function (td) {
                 const subject = td.getAttribute('data-subject');
                 if (!subject) return;
                 const pct = findAttendance(subject);
                 td.textContent = formatDisplay(td.textContent.trim());
                 td.classList.remove('tt-success', 'tt-warning', 'tt-danger');
-                if (pct >= successThreshold) {
+                if (pct >= 80) {
                     td.classList.add('tt-success');
-                } else if (pct >= threshold) {
+                } else if (pct >= 75) {
                     td.classList.add('tt-warning');
                 } else if (pct >= 0) {
                     td.classList.add('tt-danger');
@@ -440,7 +439,6 @@
 
         // Color timetable cells using a custom lookup (for medical exception recalc)
         function colorTimetableCellsWithLookup(threshold, lookup) {
-            const successThreshold = threshold + 10;
             document.querySelectorAll('#timetableGrid td.has-class[data-subject]').forEach(function (td) {
                 const subject = td.getAttribute('data-subject');
                 if (!subject) return;
@@ -456,9 +454,9 @@
                 if (pct === -1) pct = findAttendance(subject);
                 td.textContent = formatDisplay(td.textContent.trim());
                 td.classList.remove('tt-success', 'tt-warning', 'tt-danger');
-                if (pct >= successThreshold) {
+                if (pct >= 80) {
                     td.classList.add('tt-success');
-                } else if (pct >= threshold) {
+                } else if (pct >= 75) {
                     td.classList.add('tt-warning');
                 } else if (pct >= 0) {
                     td.classList.add('tt-danger');
