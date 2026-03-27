@@ -46,38 +46,34 @@ def return_attendance(username, pwd):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         }
 
-        # Login
-        login_url = "https://ecampus.psgtech.ac.in/studzone2/"
-        r = session.get(login_url, headers=headers)
+        # ---- New portal login (/studzone/) ----
+        login_page_url = "https://ecampus.psgtech.ac.in/studzone/"
+        r = session.get(login_page_url, headers=headers)
         soup = BeautifulSoup(r.text, 'html.parser')
 
-        viewstate = soup.select("#__VIEWSTATE")[0]["value"]
-        eventvalidation = soup.select("#__EVENTVALIDATION")[0]["value"]
-        viewstategen = soup.select("#__VIEWSTATEGENERATOR")[0]["value"]
+        # Extract the anti-forgery token
+        token_input = soup.find("input", {"name": "__RequestVerificationToken"})
+        token = token_input["value"] if token_input else ""
 
         payload = {
-            "__VIEWSTATE": viewstate,
-            "__VIEWSTATEGENERATOR": viewstategen,
-            "__EVENTVALIDATION": eventvalidation,
-            "txtusercheck": username,
-            "txtpwdcheck": pwd,
-            "abcd3": "Login"
+            "rollno": username,
+            "password": pwd,
+            "chkterms": "on",
+            "__RequestVerificationToken": token
         }
 
-        login_response = session.post(login_url, data=payload, headers=headers)
+        login_response = session.post(login_page_url, data=payload, headers=headers, allow_redirects=True)
 
-        # Check if login failed (page still shows login form means invalid password)
+        # Check if login failed — if we're still on the login page
         login_soup = BeautifulSoup(login_response.text, 'html.parser')
-        login_error = login_soup.find("span", {"id": "lblStatus"})
-        # If login form fields are still present, login failed
-        if login_soup.find("input", {"name": "txtusercheck"}) and login_soup.find("input", {"name": "txtpwdcheck"}):
+        if login_soup.find("input", {"id": "rollno"}) and login_soup.find("input", {"id": "password"}):
             return "Invalid Password"
 
         # Try to extract student name from post-login page
         student_name = _extract_name_from_soup(login_soup)
 
-        # Get attendance
-        attendance_url = "https://ecampus.psgtech.ac.in/studzone2/AttWfPercView.aspx"
+        # ---- Get attendance from new portal ----
+        attendance_url = "https://ecampus.psgtech.ac.in/studzone/Attendance/StudentPercentage"
         page = session.get(attendance_url, headers=headers)
         soup = BeautifulSoup(page.text, 'html.parser')
 
@@ -85,17 +81,59 @@ def return_attendance(username, pwd):
         if not student_name:
             student_name = _extract_name_from_soup(soup)
 
-        table = soup.find("table", {"class": "cssbody"})
+        # Find the attendance table — try DataTables table or any table with attendance data
+        table = soup.find("table", {"class": "table"})
         if not table:
-            # Login succeeded but attendance data is not available
+            table = soup.find("table", {"id": lambda x: x and "dataTable" in str(x).lower()})
+        if not table:
+            # Try finding any table with attendance-like headers
+            for t in soup.find_all("table"):
+                t_text = t.get_text()
+                if "Course Code" in t_text or "Attendance" in t_text:
+                    table = t
+                    break
+        if not table:
             return [], session, student_name
 
         data = []
-        for row in table.find_all("tr"):
-            cols = [ele.text.strip() for ele in row.find_all("td")]
-            data.append([ele for ele in cols if ele])
+        # Extract header row
+        thead = table.find("thead")
+        if thead:
+            header_row = thead.find("tr")
+            if header_row:
+                header_cols = [th.get_text(strip=True) for th in header_row.find_all(["th", "td"])]
+                data.append(header_cols)
 
-        return data, session, student_name
+        # Extract data rows
+        tbody = table.find("tbody")
+        rows_parent = tbody if tbody else table
+        for row in rows_parent.find_all("tr"):
+            cols = [td.get_text(strip=True) for td in row.find_all("td")]
+            if cols and any(cols):
+                data.append(cols)
+
+        # ---- Also login to old portal for timetable/course plan ----
+        old_session = requests.Session()
+        try:
+            old_login_url = "https://ecampus.psgtech.ac.in/studzone2/"
+            r2 = old_session.get(old_login_url, headers=headers)
+            old_soup = BeautifulSoup(r2.text, 'html.parser')
+            viewstate = old_soup.select("#__VIEWSTATE")[0]["value"]
+            eventvalidation = old_soup.select("#__EVENTVALIDATION")[0]["value"]
+            viewstategen = old_soup.select("#__VIEWSTATEGENERATOR")[0]["value"]
+            old_payload = {
+                "__VIEWSTATE": viewstate,
+                "__VIEWSTATEGENERATOR": viewstategen,
+                "__EVENTVALIDATION": eventvalidation,
+                "txtusercheck": username,
+                "txtpwdcheck": pwd,
+                "abcd3": "Login"
+            }
+            old_session.post(old_login_url, data=old_payload, headers=headers)
+        except:
+            old_session = session  # Fallback to new session
+
+        return data, old_session, student_name
 
     except Exception as e:
         return f"Error: {str(e)}"
@@ -240,20 +278,33 @@ def get_timetable(session):
 def data_json(data, course_plan=None):
     response = []
     for item in data[1:]:
-        if len(item) < 10:
+        if len(item) < 8:
+            continue
+
+        try:
+            total_hours = int(item[1])
+            exception_hour = int(item[2]) if item[2] else 0
+            total_present = int(item[4])
+            # Column 5 = real attendance percentage
+            real_percentage = float(item[5])
+            # Column 7 = attendance percentage with medical exception
+            percentage_with_medical = float(item[7]) if len(item) > 7 and item[7] else real_percentage
+        except (ValueError, IndexError):
             continue
 
         temp = {
             "name": item[0],
             "course_title": course_plan.get(item[0], item[0]) if course_plan else item[0],
-            "total_hours": int(item[1]),
-            "exception_hour": int(item[2]),
-            "total_present": int(item[4]),
-            "percentage_of_attendance": float(item[5]),
-            "attendance_from": item[8],
-            "attendance_to": item[9]
+            "total_hours": total_hours,
+            "exception_hour": exception_hour,
+            "total_present": total_present,
+            "percentage_of_attendance": real_percentage,
+            "percentage_with_medical": percentage_with_medical,
+            "attendance_from": item[8] if len(item) > 8 else "",
+            "attendance_to": item[9] if len(item) > 9 else ""
         }
 
+        # Calculate bunk/attend based on REAL attendance
         if temp['percentage_of_attendance'] < 75:
             temp['class_to_attend'] = math.ceil(
                 (0.75 * temp['total_hours'] - temp['total_present']) / 0.25
