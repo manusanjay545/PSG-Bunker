@@ -126,28 +126,34 @@
                     <div class="course-code">{{ subject.name }}</div>
 
                     <div class="subject-main-info">
-                        <div class="attendance-percentage">
-                            <span
-                                class="percentage-number {% if subject.percentage_of_attendance >= 80 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
-                                {{ "%.1f"|format(subject.percentage_of_attendance) }}%
-                            </span>
-                            <div class="attendance-details">
-                                {{ subject.total_present }}/{{ subject.total_hours }} classes attended
+                        <div class="info-column">
+                            <div class="status-info">
+                                {% if subject.percentage_of_attendance < 75 %}
+                                <div class="status-label status-must-attend">Attend :</div>
+                                <span class="status-number status-must-attend">{{ subject.class_to_attend }}</span>
+                                {% else %}
+                                <div class="status-label status-can-miss">Bunk :</div>
+                                <span class="status-number status-can-miss">{{ subject.class_to_bunk }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="attendance-percentage">
+                                <span
+                                    class="percentage-number {% if subject.percentage_of_attendance >= 80 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
+                                    {{ "%.1f"|format(subject.percentage_of_attendance) }}%
+                                </span>
+                                <div class="attendance-details">
+                                    {{ subject.total_present }}/{{ subject.total_hours }} classes attended
+                                </div>
                             </div>
                         </div>
-
                         <div class="status-display">
-                            {% if subject.percentage_of_attendance < 75 %} <img
-                                src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyN2JsOGVwbzRxanBkbnQ3bHB1OG1uOGRjYXVsdWo2eWVsNGxvbDRzciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/98MaHVwJOmWMz4cz1K/200.gif"
+                            {% if subject.percentage_of_attendance < 75 %}
+                            <img src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyN2JsOGVwbzRxanBkbnQ3bHB1OG1uOGRjYXVsdWo2eWVsNGxvbDRzciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/98MaHVwJOmWMz4cz1K/200.gif"
                                 alt="Stress" class="status-gif">
-                                <span class="status-number status-must-attend">{{ subject.class_to_attend }}</span>
-                                <div class="status-label status-must-attend">Must Attend</div>
-                                {% else %}
-                                <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmU4Z2U2ajRjaW44c3phbjF1OHR2d21zZ3Aya2J4dG1iOWNrNzZ4ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4OCCTJShsv0v5MFEfC/giphy.gif" alt="Party"
-                                    class="status-gif">
-                                <span class="status-number status-can-miss">{{ subject.class_to_bunk }}</span>
-                                <div class="status-label status-can-miss">Can Bunk</div>
-                                {% endif %}
+                            {% else %}
+                            <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmU4Z2U2ajRjaW44c3phbjF1OHR2d21zZ3Aya2J4dG1iOWNrNzZ4ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4OCCTJShsv0v5MFEfC/giphy.gif" alt="Party"
+                                class="status-gif">
+                            {% endif %}
                         </div>
                     </div>
 
@@ -335,18 +341,28 @@
                 if (percentage < value) {
                     // Must attend
                     const mustAttend = Math.ceil((threshold * totalHours - totalPresent) / (1 - threshold));
+                    const statusInfo = card.querySelector('.status-info');
+                    if (statusInfo) {
+                        statusInfo.innerHTML = `
+                            <div class="status-label status-must-attend">Attend :</div>
+                            <span class="status-number status-must-attend">${mustAttend}</span>
+                        `;
+                    }
                     statusDisplay.innerHTML = `
                         <img src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyN2JsOGVwbzRxanBkbnQ3bHB1OG1uOGRjYXVsdWo2eWVsNGxvbDRzciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/98MaHVwJOmWMz4cz1K/200.gif" alt="Stress" class="status-gif">
-                        <span class="status-number status-must-attend">${mustAttend}</span>
-                        <div class="status-label status-must-attend">Must Attend</div>
                     `;
                 } else {
                     // Can bunk
                     const canBunk = Math.floor((totalPresent - threshold * totalHours) / threshold);
+                    const statusInfo = card.querySelector('.status-info');
+                    if (statusInfo) {
+                        statusInfo.innerHTML = `
+                            <div class="status-label status-can-miss">Bunk :</div>
+                            <span class="status-number status-can-miss">${canBunk}</span>
+                        `;
+                    }
                     statusDisplay.innerHTML = `
                         <img src="https://media.tenor.com/ygZQDXMkWxcAAAAM/steve-harrington.gif" alt="Party" class="status-gif">
-                        <span class="status-number status-can-miss">${canBunk}</span>
-                        <div class="status-label status-can-miss">Can Bunk</div>
                     `;
                 }
             });
