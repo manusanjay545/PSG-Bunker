@@ -47,6 +47,25 @@
             </div>
         </header>
 
+        <section class="toggle-controls">
+            <div class="toggle-group">
+                <div class="percentage-toggle">
+                    <span class="toggle-label">Percentage</span>
+                    <div class="toggle-switch">
+                        <button id="btn75" class="toggle-btn active" onclick="setThreshold(75)">75%</button>
+                        <button id="btn80" class="toggle-btn" onclick="setThreshold(80)">80%</button>
+                    </div>
+                </div>
+                <div class="percentage-toggle">
+                    <span class="toggle-label">Medical Exception</span>
+                    <div class="toggle-switch">
+                        <button id="btnMedWithout" class="toggle-btn active" onclick="setMedicalException(false)">Without</button>
+                        <button id="btnMedWith" class="toggle-btn" onclick="setMedicalException(true)">With</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="timetable-section">
             <h2>🗓️ Weekly Timetable</h2>
             {% if timetable and timetable.headers %}
@@ -88,13 +107,6 @@
         <section class="attendance-section">
             <div class="attendance-header">
                 <h2>📚 Subject-wise Attendance</h2>
-                <div class="percentage-toggle">
-                    <span class="toggle-label">Percentage</span>
-                    <div class="toggle-switch">
-                        <button id="btn75" class="toggle-btn active" onclick="setThreshold(75)">75%</button>
-                        <button id="btn80" class="toggle-btn" onclick="setThreshold(80)">80%</button>
-                    </div>
-                </div>
             </div>
             {% if attendance_unavailable %}
             <div class="attendance-updating-msg"
@@ -107,7 +119,9 @@
                 {% for subject in attendance %}
                 <div class="subject-card {% if subject.percentage_of_attendance >= 85 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}"
                     data-total="{{ subject.total_hours }}" data-present="{{ subject.total_present }}"
-                    data-percentage="{{ subject.percentage_of_attendance }}">
+                    data-percentage="{{ subject.percentage_of_attendance }}"
+                    data-percentage-med="{{ subject.percentage_with_medical }}"
+                    data-exception="{{ subject.exception_hour }}">
                     <div class="subject-title">{{ subject.course_title }}</div>
                     <div class="course-code">{{ subject.name }}</div>
 
@@ -245,25 +259,50 @@
             window.open(APK_DOWNLOAD_URL, '_blank');
         }
 
-        // ====== PERCENTAGE TOGGLE ======
+        // ====== PERCENTAGE & MEDICAL EXCEPTION TOGGLE ======
         let currentThreshold = 75;
+        let medicalExceptionIncluded = false; // Default: show real attendance (Without)
 
-        function setThreshold(value) {
-            currentThreshold = value;
+        function getEffectiveValues(card) {
+            const totalHours = parseInt(card.dataset.total);
+            const originalPresent = parseInt(card.dataset.present);
+            const exceptionHour = parseInt(card.dataset.exception) || 0;
+            const realPercentage = parseFloat(card.dataset.percentage);
+            const medPercentage = parseFloat(card.dataset.percentageMed) || realPercentage;
 
-            // Update toggle buttons
-            document.getElementById('btn75').classList.toggle('active', value === 75);
-            document.getElementById('btn80').classList.toggle('active', value === 80);
+            let totalPresent, percentage;
+            if (medicalExceptionIncluded) {
+                // With medical exception — use medical exception percentage
+                percentage = medPercentage;
+                // Recalculate effective present from medical percentage
+                totalPresent = Math.round(medPercentage * totalHours / 100);
+            } else {
+                // Without medical exception — use real attendance
+                percentage = realPercentage;
+                totalPresent = originalPresent;
+            }
 
-            // Recalculate all subject cards
+            return { totalHours, totalPresent, percentage };
+        }
+
+        function recalculateAll() {
+            const value = currentThreshold;
+            const threshold = value / 100;
+
             const cards = document.querySelectorAll('.subject-card');
-            cards.forEach(card => {
-                const totalHours = parseInt(card.dataset.total);
-                const totalPresent = parseInt(card.dataset.present);
-                const percentage = parseFloat(card.dataset.percentage);
-                const threshold = value / 100;
+            // Build updated lookup for timetable coloring
+            const updatedLookup = {};
 
+            cards.forEach(card => {
+                const { totalHours, totalPresent, percentage } = getEffectiveValues(card);
                 const statusDisplay = card.querySelector('.status-display');
+
+                // Store subject name for timetable lookup
+                const courseCodeEl = card.querySelector('.course-code');
+                if (courseCodeEl) {
+                    const subjectName = courseCodeEl.textContent.trim();
+                    updatedLookup[subjectName] = percentage;
+                }
 
                 // Determine card border color class
                 card.classList.remove('success', 'warning', 'danger');
@@ -275,7 +314,7 @@
                     card.classList.add('danger');
                 }
 
-                // Update percentage number color
+                // Update percentage display
                 const percNum = card.querySelector('.percentage-number');
                 percNum.classList.remove('success', 'warning', 'danger');
                 if (percentage >= 85) {
@@ -284,6 +323,13 @@
                     percNum.classList.add('warning');
                 } else {
                     percNum.classList.add('danger');
+                }
+                percNum.textContent = percentage.toFixed(1) + '%';
+
+                // Update attendance details text
+                const detailsEl = card.querySelector('.attendance-details');
+                if (detailsEl) {
+                    detailsEl.textContent = totalPresent + '/' + totalHours + ' classes attended';
                 }
 
                 if (percentage < value) {
@@ -305,8 +351,22 @@
                 }
             });
 
-            // Also recolor timetable cells based on new threshold
-            colorTimetableCells(value);
+            // Recolor timetable cells using updated percentages
+            colorTimetableCellsWithLookup(value, updatedLookup);
+        }
+
+        function setThreshold(value) {
+            currentThreshold = value;
+            document.getElementById('btn75').classList.toggle('active', value === 75);
+            document.getElementById('btn80').classList.toggle('active', value === 80);
+            recalculateAll();
+        }
+
+        function setMedicalException(withException) {
+            medicalExceptionIncluded = withException;
+            document.getElementById('btnMedWith').classList.toggle('active', withException);
+            document.getElementById('btnMedWithout').classList.toggle('active', !withException);
+            recalculateAll();
         }
     </script>
 
@@ -361,16 +421,41 @@
 
         // Color all timetable cells based on the selected threshold
         function colorTimetableCells(threshold) {
-            const successThreshold = threshold + 10; // 85 for 75%, 90 for 80%
+            const successThreshold = threshold + 10;
             document.querySelectorAll('#timetableGrid td.has-class[data-subject]').forEach(function (td) {
                 const subject = td.getAttribute('data-subject');
                 if (!subject) return;
                 const pct = findAttendance(subject);
-                // Format display text
                 td.textContent = formatDisplay(td.textContent.trim());
-                // Remove old color classes
                 td.classList.remove('tt-success', 'tt-warning', 'tt-danger');
-                // Apply color class based on current threshold
+                if (pct >= successThreshold) {
+                    td.classList.add('tt-success');
+                } else if (pct >= threshold) {
+                    td.classList.add('tt-warning');
+                } else if (pct >= 0) {
+                    td.classList.add('tt-danger');
+                }
+            });
+        }
+
+        // Color timetable cells using a custom lookup (for medical exception recalc)
+        function colorTimetableCellsWithLookup(threshold, lookup) {
+            const successThreshold = threshold + 10;
+            document.querySelectorAll('#timetableGrid td.has-class[data-subject]').forEach(function (td) {
+                const subject = td.getAttribute('data-subject');
+                if (!subject) return;
+                // Try the updated lookup first, fall back to original
+                let pct = -1;
+                for (const [key, val] of Object.entries(lookup)) {
+                    if (subject.includes(key) || key.includes(subject) ||
+                        normalize(subject) === normalize(key)) {
+                        pct = val;
+                        break;
+                    }
+                }
+                if (pct === -1) pct = findAttendance(subject);
+                td.textContent = formatDisplay(td.textContent.trim());
+                td.classList.remove('tt-success', 'tt-warning', 'tt-danger');
                 if (pct >= successThreshold) {
                     td.classList.add('tt-success');
                 } else if (pct >= threshold) {
