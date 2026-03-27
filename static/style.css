@@ -804,6 +804,30 @@ h2 {
     }
 }
 
+/* ===== Toggle Controls Section ===== */
+.toggle-controls {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.toggle-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+@media (max-width: 480px) {
+    .toggle-group {
+        align-items: stretch;
+        gap: 1.25rem;
+    }
+
+    .toggle-group .percentage-toggle {
+        justify-content: center;
+    }
+}
+
 /* ===== Timetable Section ===== */
 .timetable-section {
     margin-top: 2.5rem;
