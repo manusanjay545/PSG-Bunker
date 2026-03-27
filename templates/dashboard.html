@@ -47,6 +47,44 @@
             </div>
         </header>
 
+        <section class="timetable-section">
+            <h2>🗓️ Weekly Timetable</h2>
+            {% if timetable and timetable.headers %}
+            <div class="timetable-wrapper">
+                <div class="timetable-scroll">
+                    <table class="timetable" id="timetableGrid">
+                        <thead>
+                            <tr>
+                                {% for header in timetable.headers %}
+                                <th>{{ header }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in timetable.rows %}
+                            <tr>
+                                {% for cell in row %}
+                                {% if loop.index0 == 0 %}
+                                <td class="day-cell">{{ cell }}</td>
+                                {% elif cell %}
+                                <td class="has-class" data-subject="{{ cell.strip() }}">{{ cell }}</td>
+                                {% else %}
+                                <td class="empty-cell">{{ cell }}</td>
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-timetable">
+                <p>📭 Timetable data is not available at the moment.</p>
+            </div>
+            {% endif %}
+        </section>
+
         <section class="attendance-section">
             <div class="attendance-header">
                 <h2>📚 Subject-wise Attendance</h2>
@@ -105,44 +143,6 @@
                     </div>
                 </div>
                 {% endfor %}
-            </div>
-            {% endif %}
-        </section>
-
-        <section class="timetable-section">
-            <h2>🗓️ Weekly Timetable</h2>
-            {% if timetable and timetable.headers %}
-            <div class="timetable-wrapper">
-                <div class="timetable-scroll">
-                    <table class="timetable" id="timetableGrid">
-                        <thead>
-                            <tr>
-                                {% for header in timetable.headers %}
-                                <th>{{ header }}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in timetable.rows %}
-                            <tr>
-                                {% for cell in row %}
-                                {% if loop.index0 == 0 %}
-                                <td class="day-cell">{{ cell }}</td>
-                                {% elif cell %}
-                                <td class="has-class" data-subject="{{ cell.strip() }}">{{ cell }}</td>
-                                {% else %}
-                                <td class="empty-cell">{{ cell }}</td>
-                                {% endif %}
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% else %}
-            <div class="no-timetable">
-                <p>📭 Timetable data is not available at the moment.</p>
             </div>
             {% endif %}
         </section>
@@ -304,14 +304,15 @@
                     `;
                 }
             });
+
+            // Also recolor timetable cells based on new threshold
+            colorTimetableCells(value);
         }
     </script>
 
     <script>
         // ====== TIMETABLE CELL COLORING ======
-        (function () {
-            const attendanceLookup = {{ attendance_lookup | tojson
-        }};
+        const attendanceLookup = {{ attendance_lookup | tojson }};
 
         // Normalize a code string for flexible matching
         function normalize(str) {
@@ -358,23 +359,30 @@
             return -1;
         }
 
-        // Color all timetable cells
-        document.querySelectorAll('#timetableGrid td.has-class[data-subject]').forEach(function (td) {
-            const subject = td.getAttribute('data-subject');
-            if (!subject) return;
-            const pct = findAttendance(subject);
-            // Format display text
-            td.textContent = formatDisplay(td.textContent.trim());
-            // Apply color class
-            if (pct >= 85) {
-                td.classList.add('tt-success');
-            } else if (pct >= 75) {
-                td.classList.add('tt-warning');
-            } else if (pct >= 0) {
-                td.classList.add('tt-danger');
-            }
-        });
-        }) ();
+        // Color all timetable cells based on the selected threshold
+        function colorTimetableCells(threshold) {
+            const successThreshold = threshold + 10; // 85 for 75%, 90 for 80%
+            document.querySelectorAll('#timetableGrid td.has-class[data-subject]').forEach(function (td) {
+                const subject = td.getAttribute('data-subject');
+                if (!subject) return;
+                const pct = findAttendance(subject);
+                // Format display text
+                td.textContent = formatDisplay(td.textContent.trim());
+                // Remove old color classes
+                td.classList.remove('tt-success', 'tt-warning', 'tt-danger');
+                // Apply color class based on current threshold
+                if (pct >= successThreshold) {
+                    td.classList.add('tt-success');
+                } else if (pct >= threshold) {
+                    td.classList.add('tt-warning');
+                } else if (pct >= 0) {
+                    td.classList.add('tt-danger');
+                }
+            });
+        }
+
+        // Initial coloring with default 75% threshold
+        colorTimetableCells(75);
     </script>
 </body>
 
