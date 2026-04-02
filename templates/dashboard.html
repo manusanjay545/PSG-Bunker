@@ -1,489 +1,131 @@
-<!DOCTYPE html>
-<html lang="en">
+<section class="timetable-section">
+    <h2>🗓️ Weekly Timetable</h2>
 
-<head>
-    <meta name="title" content="PSG Bunker – PSG Tech Attendance Tracker">
-    <meta name="description"
-        content="Secure web application for PSG College of Technology students to track attendance and manage academic data with mobile-optimized interface">
-    <meta name="keywords" content="PSG Tech, attendance tracker, student portal, academic management">
-    <meta name="robots" content="index, follow">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if timetable and timetable.headers %}
+    <div class="timetable-wrapper">
+        <div class="timetable-scroll">
+            <table class="timetable" id="timetableGrid">
+                <thead>
+                    <tr>
+                        {% for header in timetable.headers %}
+                        <th>{{ header }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in timetable.rows %}
+                    <tr>
+                        {% for cell in row %}
+                        {% if loop.index0 == 0 %}
+                        <td class="day-cell">{{ cell }}</td>
+                        {% elif cell %}
+                        <td class="has-class" data-subject="{{ cell.strip() }}">{{ cell }}</td>
+                        {% else %}
+                        <td class="empty-cell">{{ cell }}</td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="no-timetable">
+        <p>📭 Timetable data is not available.</p>
+    </div>
+    {% endif %}
+</section>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - PSG Bunker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-    <meta name="monetag" content="c86cf967f8378e70d69668985a5dbdba">
-</head>
+<!-- ✅ Attendance Section (BEST VERSION) -->
+{% if attendance_unavailable %}
+<div class="attendance-updating-msg"
+    style="
+        background: rgba(255, 165, 0, 0.15);
+        border: 1px solid #ffa500;
+        color: #ffa500;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        margin: 2rem 0;
+        font-size: 1.1rem;
+        font-weight: 500;">
+    ⚠️ Attendance is currently being updated. Please try again later.
+</div>
+{% else %}
 
-<body>
-    <div class="container">
-        <header class="dashboard-header">
-            <div class="header-content">
-                <div class="header-left">
-                    <h1>📚 PSG Bunker Dashboard</h1>
-                    <p class="welcome-text">Welcome, {{ student_name or rollno }} | PSG College of Technology</p>
-                </div>
-                <div class="header-right">
-                    <div class="header-buttons">
-                        <button id="shareBtn" class="btn btn--gradient share-btn">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path
-                                    d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.18875 15.0129 5.37498 15.0378 5.55669L8.95808 9.01006C8.41831 8.39293 7.66395 8 6.81818 8C5.16134 8 3.81818 9.34315 3.81818 11C3.81818 12.6569 5.16134 14 6.81818 14C7.66395 14 8.41831 13.6071 8.95808 12.9899L15.0378 16.4433C15.0129 16.625 15 16.8113 15 17C15 18.6569 16.3431 20 18 20C19.6569 20 21 18.6569 21 17C21 15.3431 19.6569 14 18 14C17.1542 14 16.3998 14.3929 15.8601 15.0101L9.78033 11.5567C9.80524 11.375 9.81818 11.1887 9.81818 11C9.81818 10.8113 9.80524 10.625 9.78033 10.4433L15.8601 6.98994C16.3998 7.60706 17.1542 8 18 8Z"
-                                    fill="currentColor" />
-                            </svg>
-                            Share App
-                        </button>
-                        <button onclick="downloadApp()" class="btn btn--gradient download-btn-dashboard">
-                            <img src="{{ url_for('static', filename='favicon.ico') }}" alt="App Icon"
-                                class="btn-icon-small">
-                            Download App
-                        </button>
-                        <a href="/" class="btn btn--secondary logout-btn">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <section class="toggle-controls">
-            <div class="toggle-group">
-                <div class="percentage-toggle">
-                    <span class="toggle-label">Medical Exception</span>
-                    <div class="toggle-switch">
-                        <button id="btnMedWithout" class="toggle-btn active" onclick="setMedicalException(false)">Without</button>
-                        <button id="btnMedWith" class="toggle-btn" onclick="setMedicalException(true)">With</button>
-                    </div>
-                </div>
-                <div class="percentage-toggle">
-                    <span class="toggle-label">Percentage</span>
-                    <div class="toggle-switch">
-                        <button id="btn75" class="toggle-btn active" onclick="setThreshold(75)">75%</button>
-                        <button id="btn80" class="toggle-btn" onclick="setThreshold(80)">80%</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="timetable-section">
-            <h2>🗓️ Weekly Timetable</h2>
-            {% if timetable and timetable.headers %}
-            <div class="timetable-wrapper">
-                <div class="timetable-scroll">
-                    <table class="timetable" id="timetableGrid">
-                        <thead>
-                            <tr>
-                                {% for header in timetable.headers %}
-                                <th>{{ header }}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in timetable.rows %}
-                            <tr>
-                                {% for cell in row %}
-                                {% if loop.index0 == 0 %}
-                                <td class="day-cell">{{ cell }}</td>
-                                {% elif cell %}
-                                <td class="has-class" data-subject="{{ cell.strip() }}">{{ cell }}</td>
-                                {% else %}
-                                <td class="empty-cell">{{ cell }}</td>
-                                {% endif %}
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% else %}
-            <div class="no-timetable">
-                <p>📭 Timetable data is not available at the moment.</p>
-            </div>
-            {% endif %}
-        </section>
-
-        <section class="attendance-section">
-            <div class="attendance-header">
-                <h2>📚 Subject-wise Attendance</h2>
-            </div>
-            {% if attendance_unavailable %}
-            <div class="attendance-updating-msg"
-                style="background-color: rgba(255, 165, 0, 0.15); border: 1px solid #ffa500; color: #ffa500; padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0; font-size: 1.1rem; font-weight: 500;">
-                ⚠️ Attendance is Updating, Please try again later
-            </div>
-            {% endif %}
-            {% if attendance %}
-            <div class="subjects-grid">
-                {% for subject in attendance %}
-                <div class="subject-card {% if subject.percentage_of_attendance >= 80 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}"
-                    data-total="{{ subject.total_hours }}" data-present="{{ subject.total_present }}"
-                    data-percentage="{{ subject.percentage_of_attendance }}"
-                    data-percentage-med="{{ subject.percentage_with_medical }}"
-                    data-exception="{{ subject.exception_hour }}">
-                    <div class="subject-title">{{ subject.course_title }}</div>
-                    <div class="course-code">{{ subject.name }}</div>
-
-                    <div class="subject-main-info">
-                        <div class="info-column">
-                            <div class="status-info">
-                                {% if subject.percentage_of_attendance < 75 %}
-                                <div class="status-label status-must-attend">Attend :</div>
-                                <span class="status-number status-must-attend">{{ subject.class_to_attend }}</span>
-                                {% else %}
-                                <div class="status-label status-can-miss">Bunk :</div>
-                                <span class="status-number status-can-miss">{{ subject.class_to_bunk }}</span>
-                                {% endif %}
-                            </div>
-                            <div class="attendance-percentage">
-                                <span
-                                    class="percentage-number {% if subject.percentage_of_attendance >= 80 %}success{% elif subject.percentage_of_attendance >= 75 %}warning{% else %}danger{% endif %}">
-                                    {{ "%.1f"|format(subject.percentage_of_attendance) }}%
-                                </span>
-                                <div class="attendance-details">
-                                    {{ subject.total_present }}/{{ subject.total_hours }} classes attended
-                                </div>
-                            </div>
-                        </div>
-                        <div class="status-display">
-                            {% if subject.percentage_of_attendance < 75 %}
-                            <img src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyN2JsOGVwbzRxanBkbnQ3bHB1OG1uOGRjYXVsdWo2eWVsNGxvbDRzciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/98MaHVwJOmWMz4cz1K/200.gif"
-                                alt="Stress" class="status-gif">
-                            {% else %}
-                            <img src="https://media.tenor.com/FoTjqLkippcAAAAM/smiling-dog-chihuahua.gif" alt="Party"
-                                class="status-gif">
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="subject-footer">
-                        <div>From: {{ subject.attendance_from }}</div>
-                        <div>To: {{ subject.attendance_to }}</div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </section>
-
-        <footer class="dashboard-footer">
-            <p>Website developed by <strong>Manu Sanjay</strong> Btech-IT PSG TECH</p>
-            <p class="social-link">
-                <span class="click-text">click 👉:</span>
-                <img src="https://img.freepik.com/premium-psd/instagram-logo_971166-164497.jpg?semt=ais_incoming&w=740&q=80"
-                    alt="Instagram" class="instagram-icon"
-                    onerror="this.style.display=' none'; this.nextElementSibling.style.display='inline' ;">
-                <span class="instagram-fallback" style="display: none;">📷</span>
-                <a href="https://instagram.com/manu_sanjay.m" target="_blank"
-                    class="instagram-handle">@manu_sanjay.m</a>
-            </p>
-        </footer>
+<section class="attendance-section">
+    <div class="attendance-header">
+        <h2>📚 Subject-wise Attendance</h2>
     </div>
 
-    <script>
-        // Share functionality
-        document.getElementById('shareBtn').addEventListener('click', async function () {
-            const shareData = {
-                title: 'PSG Bunker - Attendance Tracker',
-                text: 'Check out PSG Bunker - the smart attendance tracker for PSG Tech students!',
-                url: window.location.origin
-            };
+    {% if attendance %}
+    <div class="subjects-grid">
+        {% for subject in attendance %}
+        <div class="subject-card 
+            {% if subject.percentage_of_attendance >= 80 %}success
+            {% elif subject.percentage_of_attendance >= 75 %}warning
+            {% else %}danger{% endif %}"
 
-            if (navigator.share) {
-                try {
-                    await navigator.share(shareData);
-                    console.log('Successfully shared');
-                } catch (err) {
-                    console.log('Error sharing:', err);
-                    fallbackShare(shareData.url);
-                }
-            } else {
-                fallbackShare(shareData.url);
-            }
-        });
+            data-total="{{ subject.total_hours }}"
+            data-present="{{ subject.total_present }}"
+            data-percentage="{{ subject.percentage_of_attendance }}"
+            data-percentage-med="{{ subject.percentage_with_medical }}"
+            data-exception="{{ subject.exception_hour }}">
 
-        function fallbackShare(url) {
-            navigator.clipboard.writeText(url).then(function () {
-                // Show a toast notification
-                showToast('Link copied to clipboard!');
-            }).catch(function (err) {
-                console.error('Could not copy text: ', err);
-                showToast('Unable to share. Please copy the URL manually.');
-            });
-        }
+            <div class="subject-title">{{ subject.course_title }}</div>
+            <div class="course-code">{{ subject.name }}</div>
 
-        function showToast(message) {
-            // Create toast element
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
+            <div class="subject-main-info">
+                <div class="info-column">
+                    <div class="status-info">
+                        {% if subject.percentage_of_attendance < 75 %}
+                        <div class="status-label status-must-attend">Attend :</div>
+                        <span class="status-number status-must-attend">
+                            {{ subject.class_to_attend }}
+                        </span>
+                        {% else %}
+                        <div class="status-label status-can-miss">Bunk :</div>
+                        <span class="status-number status-can-miss">
+                            {{ subject.class_to_bunk }}
+                        </span>
+                        {% endif %}
+                    </div>
 
-            // Style the toast
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #4a9eff;
-                color: white;
-                padding: 12px 24px;
-                border-radius: 6px;
-                z-index: 10000;
-                animation: slideIn 0.3s ease;
-            `;
+                    <div class="attendance-percentage">
+                        <span class="percentage-number 
+                            {% if subject.percentage_of_attendance >= 80 %}success
+                            {% elif subject.percentage_of_attendance >= 75 %}warning
+                            {% else %}danger{% endif %}">
+                            {{ "%.1f"|format(subject.percentage_of_attendance) }}%
+                        </span>
 
-            document.body.appendChild(toast);
+                        <div class="attendance-details">
+                            {{ subject.total_present }}/{{ subject.total_hours }} classes attended
+                        </div>
+                    </div>
+                </div>
 
-            // Remove toast after 3 seconds
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 3000);
-        }
+                <div class="status-display">
+                    {% if subject.percentage_of_attendance < 75 %}
+                    <img src="https://media1.giphy.com/media/98MaHVwJOmWMz4cz1K/200.gif"
+                        class="status-gif">
+                    {% else %}
+                    <img src="https://media.tenor.com/FoTjqLkippcAAAAM/smiling-dog-chihuahua.gif"
+                        class="status-gif">
+                    {% endif %}
+                </div>
+            </div>
 
-        // Add CSS for toast animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+            <div class="subject-footer">
+                <div>From: {{ subject.attendance_from }}</div>
+                <div>To: {{ subject.attendance_to }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</section>
 
-    <script>
-        // ====== APK DOWNLOAD URL ======
-        const APK_DOWNLOAD_URL = 'https://github.com/manusanjay545/PSG-Bunker/raw/main/static/PSGBunker.apk';
-
-        function downloadApp() {
-            window.open(APK_DOWNLOAD_URL, '_blank');
-        }
-
-        // ====== PERCENTAGE & MEDICAL EXCEPTION TOGGLE ======
-        let currentThreshold = 75;
-        let medicalExceptionIncluded = false; // Default: show real attendance (Without)
-
-        function getEffectiveValues(card) {
-            const totalHours = parseInt(card.dataset.total);
-            const originalPresent = parseInt(card.dataset.present);
-            const exceptionHour = parseInt(card.dataset.exception) || 0;
-            const realPercentage = parseFloat(card.dataset.percentage);
-            const medPercentage = parseFloat(card.dataset.percentageMed) || realPercentage;
-
-            let totalPresent, percentage;
-            if (medicalExceptionIncluded) {
-                // With medical exception — use medical exception percentage
-                percentage = medPercentage;
-                // Recalculate effective present from medical percentage
-                totalPresent = Math.round(medPercentage * totalHours / 100);
-            } else {
-                // Without medical exception — use real attendance
-                percentage = realPercentage;
-                totalPresent = originalPresent;
-            }
-
-            return { totalHours, totalPresent, percentage };
-        }
-
-        function recalculateAll() {
-            const value = currentThreshold;
-            const threshold = value / 100;
-
-            const cards = document.querySelectorAll('.subject-card');
-            // Build updated lookup for timetable coloring
-            const updatedLookup = {};
-
-            cards.forEach(card => {
-                const { totalHours, totalPresent, percentage } = getEffectiveValues(card);
-                const statusDisplay = card.querySelector('.status-display');
-
-                // Store subject name for timetable lookup
-                const courseCodeEl = card.querySelector('.course-code');
-                if (courseCodeEl) {
-                    const subjectName = courseCodeEl.textContent.trim();
-                    updatedLookup[subjectName] = percentage;
-                }
-
-                // Determine card border color class
-                card.classList.remove('success', 'warning', 'danger');
-                if (percentage >= 80) {
-                    card.classList.add('success');
-                } else if (percentage >= 75) {
-                    card.classList.add('warning');
-                } else {
-                    card.classList.add('danger');
-                }
-
-                // Update percentage display
-                const percNum = card.querySelector('.percentage-number');
-                percNum.classList.remove('success', 'warning', 'danger');
-                if (percentage >= 80) {
-                    percNum.classList.add('success');
-                } else if (percentage >= 75) {
-                    percNum.classList.add('warning');
-                } else {
-                    percNum.classList.add('danger');
-                }
-                percNum.textContent = percentage.toFixed(1) + '%';
-
-                // Update attendance details text
-                const detailsEl = card.querySelector('.attendance-details');
-                if (detailsEl) {
-                    detailsEl.textContent = totalPresent + '/' + totalHours + ' classes attended';
-                }
-
-                if (percentage < value) {
-                    // Must attend
-                    const mustAttend = Math.ceil((threshold * totalHours - totalPresent) / (1 - threshold));
-                    const statusInfo = card.querySelector('.status-info');
-                    if (statusInfo) {
-                        statusInfo.innerHTML = `
-                            <div class="status-label status-must-attend">Attend :</div>
-                            <span class="status-number status-must-attend">${mustAttend}</span>
-                        `;
-                    }
-                    statusDisplay.innerHTML = `
-                        <img src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyN2JsOGVwbzRxanBkbnQ3bHB1OG1uOGRjYXVsdWo2eWVsNGxvbDRzciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/98MaHVwJOmWMz4cz1K/200.gif" alt="Stress" class="status-gif">
-                    `;
-                } else {
-                    // Can bunk
-                    const canBunk = Math.max(0, Math.floor((totalPresent - threshold * totalHours) / threshold));
-                    const statusInfo = card.querySelector('.status-info');
-                    if (statusInfo) {
-                        statusInfo.innerHTML = `
-                            <div class="status-label status-can-miss">Bunk :</div>
-                            <span class="status-number status-can-miss">${canBunk}</span>
-                        `;
-                    }
-                    statusDisplay.innerHTML = `
-                        <img src="https://media.tenor.com/FoTjqLkippcAAAAM/smiling-dog-chihuahua.gif" alt="Party" class="status-gif">
-                    `;
-                }
-            });
-
-            // Recolor timetable cells using updated percentages
-            colorTimetableCellsWithLookup(value, updatedLookup);
-        }
-
-        function setThreshold(value) {
-            currentThreshold = value;
-            document.getElementById('btn75').classList.toggle('active', value === 75);
-            document.getElementById('btn80').classList.toggle('active', value === 80);
-            recalculateAll();
-        }
-
-        function setMedicalException(withException) {
-            medicalExceptionIncluded = withException;
-            document.getElementById('btnMedWith').classList.toggle('active', withException);
-            document.getElementById('btnMedWithout').classList.toggle('active', !withException);
-            recalculateAll();
-        }
-    </script>
-
-    <script>
-        // ====== TIMETABLE CELL COLORING ======
-        const attendanceLookup = {{ attendance_lookup | tojson }};
-
-        // Normalize a code string for flexible matching
-        function normalize(str) {
-            return str.replace(/\s+/g, '').replace(/_/g, '').toLowerCase();
-        }
-
-        // Build normalized lookup
-        const normalizedLookup = {};
-        for (const [key, pct] of Object.entries(attendanceLookup)) {
-            normalizedLookup[normalize(key)] = pct;
-        }
-
-        // Format display text: add space after semester digit (first digit after _)
-        function formatDisplay(text) {
-            return text.replace(/(_\d)(\d)/g, '$1 $2');
-        }
-
-        // Find attendance percentage for a cell
-        function findAttendance(cellText) {
-            const clean = cellText.trim().split('\n')[0].trim();
-            // Try exact match
-            if (attendanceLookup[clean] !== undefined) return attendanceLookup[clean];
-            // Try without "BT " prefix
-            const noPre = clean.startsWith('BT ') ? clean.slice(3) : clean;
-            if (attendanceLookup[noPre] !== undefined) return attendanceLookup[noPre];
-            // Try last token
-            const last = clean.split(' ').pop();
-            if (attendanceLookup[last] !== undefined) return attendanceLookup[last];
-            // Try normalized matching
-            const norm = normalize(clean);
-            if (normalizedLookup[norm] !== undefined) return normalizedLookup[norm];
-            const normNoPre = normalize(noPre);
-            if (normalizedLookup[normNoPre] !== undefined) return normalizedLookup[normNoPre];
-            const normLast = normalize(last);
-            if (normalizedLookup[normLast] !== undefined) return normalizedLookup[normLast];
-            // Try if any attendance key is contained in cell text or vice versa
-            for (const [key, pct] of Object.entries(attendanceLookup)) {
-                if (clean.includes(key) || key.includes(clean) ||
-                    noPre.includes(key) || key.includes(noPre) ||
-                    last.includes(key) || key.includes(last)) {
-                    return pct;
-                }
-            }
-            return -1;
-        }
-
-        // Color all timetable cells based on the selected threshold
-        function colorTimetableCells(threshold) {
-            document.querySelectorAll('#timetableGrid td.has-class[data-subject]').forEach(function (td) {
-                const subject = td.getAttribute('data-subject');
-                if (!subject) return;
-                const pct = findAttendance(subject);
-                td.textContent = formatDisplay(td.textContent.trim());
-                td.classList.remove('tt-success', 'tt-warning', 'tt-danger');
-                if (pct >= 80) {
-                    td.classList.add('tt-success');
-                } else if (pct >= 75) {
-                    td.classList.add('tt-warning');
-                } else if (pct >= 0) {
-                    td.classList.add('tt-danger');
-                }
-            });
-        }
-
-        // Color timetable cells using a custom lookup (for medical exception recalc)
-        function colorTimetableCellsWithLookup(threshold, lookup) {
-            document.querySelectorAll('#timetableGrid td.has-class[data-subject]').forEach(function (td) {
-                const subject = td.getAttribute('data-subject');
-                if (!subject) return;
-                // Try the updated lookup first, fall back to original
-                let pct = -1;
-                for (const [key, val] of Object.entries(lookup)) {
-                    if (subject.includes(key) || key.includes(subject) ||
-                        normalize(subject) === normalize(key)) {
-                        pct = val;
-                        break;
-                    }
-                }
-                if (pct === -1) pct = findAttendance(subject);
-                td.textContent = formatDisplay(td.textContent.trim());
-                td.classList.remove('tt-success', 'tt-warning', 'tt-danger');
-                if (pct >= 80) {
-                    td.classList.add('tt-success');
-                } else if (pct >= 75) {
-                    td.classList.add('tt-warning');
-                } else if (pct >= 0) {
-                    td.classList.add('tt-danger');
-                }
-            });
-        }
-
-        // Initial coloring with default 75% threshold
-        colorTimetableCells(75);
-    </script>
-</body>
-
-</html>
+{% endif %}
