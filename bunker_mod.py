@@ -43,11 +43,14 @@ def return_attendance(username, pwd):
     try:
         session = requests.Session()
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+            "Origin": "https://ecampus.psgtech.ac.in",
+            "Referer": "https://ecampus.psgtech.ac.in/studzone/",
         }
 
-        # ---- New portal login (/studzone/) ----
+        # ---- New portal login (/studzone) ----
         login_page_url = "https://ecampus.psgtech.ac.in/studzone/"
+        login_post_url = "https://ecampus.psgtech.ac.in/studzone"
         r = session.get(login_page_url, headers=headers)
         soup = BeautifulSoup(r.text, 'html.parser')
 
@@ -62,11 +65,28 @@ def return_attendance(username, pwd):
             "__RequestVerificationToken": token
         }
 
-        login_response = session.post(login_page_url, data=payload, headers=headers, allow_redirects=True)
+        login_response = session.post(login_post_url, data=payload, headers=headers, allow_redirects=True)
+
+        # Debug: Log response details to help diagnose login issues
+        print(f"[DEBUG] Login response status: {login_response.status_code}")
+        print(f"[DEBUG] Login response URL: {login_response.url}")
 
         # Check if login failed — if we're still on the login page
         login_soup = BeautifulSoup(login_response.text, 'html.parser')
+
+        # Debug: Print all input field names on the response page
+        all_inputs = login_soup.find_all("input")
+        input_names = [(inp.get("name"), inp.get("id"), inp.get("type")) for inp in all_inputs]
+        print(f"[DEBUG] Form inputs found on response page: {input_names}")
+
         if login_soup.find("input", {"id": "rollno"}) and login_soup.find("input", {"id": "password"}):
+            # Debug: Check if there's an error message shown on the page
+            error_spans = login_soup.find_all("span", {"class": "text-danger"})
+            for span in error_spans:
+                print(f"[DEBUG] eCampus error message: {span.get_text(strip=True)}")
+            error_divs = login_soup.find_all("div", {"class": lambda c: c and "alert" in str(c).lower()})
+            for div in error_divs:
+                print(f"[DEBUG] eCampus alert: {div.get_text(strip=True)}")
             return "Invalid Password"
 
         # Try to extract student name from post-login page
