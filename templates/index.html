@@ -288,99 +288,7 @@
             border-radius: 4px;
         }
 
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
 
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background-color: #2a2a2a;
-            padding: 2rem;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            position: relative;
-            border: 1px solid #444;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.show .modal-content {
-            transform: translateY(0);
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: #888;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
-            line-height: 1;
-        }
-
-        .close-modal:hover {
-            color: #fff;
-        }
-
-        .modal-icon-container {
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: center;
-        }
-
-        .modal-app-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-content h2 {
-            color: #fff;
-            margin-bottom: 0.5rem;
-            font-size: 1.5rem;
-            border: none;
-            padding: 0;
-        }
-
-        .modal-content p {
-            color: #ccc;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        .modal-actions .btn {
-            flex: 1;
-        }
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
@@ -418,14 +326,6 @@
             .instagram-icon {
                 width: 18px;
                 height: 18px;
-            }
-
-            .modal-content {
-                padding: 1.5rem;
-            }
-
-            .modal-actions {
-                flex-direction: column;
             }
         }
     </style>
@@ -485,112 +385,18 @@
         </div>
     </div>
 
-    <!-- Download App Modal -->
-    <div id="downloadModal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal()">×</button>
-            <div class="modal-icon-container">
-                <img src="{{ url_for('static', filename='favicon.ico') }}" alt="App Icon" class="modal-app-icon">
-            </div>
-            <h2>Get the App!</h2>
-            <p>Download the PSG Bunker Android app for a better experience.</p>
-            <div class="modal-actions">
-                <button onclick="closeModal()" class="btn btn--secondary">Later</button>
-                <button onclick="downloadApp(); closeModal();" class="btn btn--primary">Download Now</button>
-            </div>
-        </div>
-    </div>
+
 
     <script>
         // ====== APK DOWNLOAD URL ======
         const APK_DOWNLOAD_URL = 'https://github.com/manusanjay545/PSG-Bunker/raw/main/static/PSGBunker.apk';
 
-        // ====== AUTO-LOGIN FROM SAVED CREDENTIALS ======
+        // ====== CLEAR ANY PREVIOUSLY SAVED CREDENTIALS ======
         document.addEventListener('DOMContentLoaded', function () {
-            const savedRollno = localStorage.getItem('psgBunkerRollno');
-            const savedPassword = localStorage.getItem('psgBunkerPassword');
-
-            if (savedRollno && savedPassword) {
-                // Show loading state
-                const loginBox = document.querySelector('.login-box');
-                const originalContent = loginBox.innerHTML;
-                loginBox.innerHTML = `
-                    <div class="logo-section">
-                        <div class="logo-circle">
-                            <span class="logo-text">🎓</span>
-                        </div>
-                        <h1 class="app-title">PSG Bunker</h1>
-                        <p class="app-subtitle" style="margin-top: 1rem;">Logging you in automatically...</p>
-                        <div style="margin-top: 1.5rem;">
-                            <div style="width: 40px; height: 40px; border: 3px solid #333; border-top: 3px solid #4a9eff; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-                        </div>
-                    </div>
-                `;
-                // Add spinner animation
-                const spinStyle = document.createElement('style');
-                spinStyle.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
-                document.head.appendChild(spinStyle);
-
-                // Auto-login via AJAX
-                fetch('/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ rollno: savedRollno, password: savedPassword })
-                })
-                .then(function(response) { return response.json(); })
-                .then(function(data) {
-                    if (data.ok) {
-                        window.location.href = '/dashboard';
-                    } else {
-                        // Credentials no longer valid, clear them
-                        localStorage.removeItem('psgBunkerRollno');
-                        localStorage.removeItem('psgBunkerPassword');
-                        loginBox.innerHTML = originalContent;
-                        // Show error
-                        const form = loginBox.querySelector('.login-form');
-                        if (form) {
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'error-message';
-                            errorDiv.textContent = 'Session expired. Please login again.';
-                            form.parentNode.insertBefore(errorDiv, form);
-                        }
-                    }
-                })
-                .catch(function() {
-                    // Network error, clear and show form
-                    localStorage.removeItem('psgBunkerRollno');
-                    localStorage.removeItem('psgBunkerPassword');
-                    loginBox.innerHTML = originalContent;
-                });
-            } else {
-                // No saved credentials - show popup if not seen
-                if (!localStorage.getItem('appPopupSeen')) {
-                    setTimeout(function () {
-                        document.getElementById('downloadModal').classList.add('show');
-                    }, 2000);
-                }
-            }
+            // Remove any old saved credentials so auto-login never happens
+            localStorage.removeItem('psgBunkerRollno');
+            localStorage.removeItem('psgBunkerPassword');
         });
-
-        // ====== SAVE CREDENTIALS ON MANUAL LOGIN ======
-        document.addEventListener('DOMContentLoaded', function () {
-            const loginForm = document.querySelector('.login-form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', function () {
-                    const rollno = document.getElementById('rollno').value;
-                    const password = document.getElementById('password').value;
-                    if (rollno && password) {
-                        localStorage.setItem('psgBunkerRollno', rollno);
-                        localStorage.setItem('psgBunkerPassword', password);
-                    }
-                });
-            }
-        });
-
-        function closeModal() {
-            document.getElementById('downloadModal').classList.remove('show');
-            localStorage.setItem('appPopupSeen', 'true');
-        }
 
         function downloadApp() {
             // Show downloading message
