@@ -393,13 +393,6 @@
         // ====== APK DOWNLOAD URL ======
         const APK_DOWNLOAD_URL = 'https://github.com/manusanjay545/PSG-Bunker/raw/main/static/PSGBunker.apk';
 
-        // ====== CLEAR ANY PREVIOUSLY SAVED CREDENTIALS ======
-        document.addEventListener('DOMContentLoaded', function () {
-            // Remove any old saved credentials so auto-login never happens
-            localStorage.removeItem('psgBunkerRollno');
-            localStorage.removeItem('psgBunkerPassword');
-        });
-
         function downloadApp() {
             // Show downloading message
             const toast = document.createElement('div');
