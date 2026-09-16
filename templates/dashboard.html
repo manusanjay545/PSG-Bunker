@@ -237,7 +237,11 @@
                         <thead>
                             <tr>
                                 {% for header in timetable.headers %}
-                                <th>{{ header }}</th>
+                                {% if loop.first %}
+                                <th class="day-time-header" scope="col">{{ header }}</th>
+                                {% else %}
+                                <th scope="col">{{ header }}</th>
+                                {% endif %}
                                 {% endfor %}
                             </tr>
                         </thead>
@@ -246,7 +250,7 @@
                             <tr>
                                 {% for cell in row %}
                                 {% if loop.index0 == 0 %}
-                                <td class="day-cell">{{ cell }}</td>
+                                <th class="day-cell" scope="row">{{ cell }}</th>
                                 {% elif cell %}
                                 <td class="has-class" data-subject="{{ cell.strip() }}">{{ cell }}</td>
                                 {% else %}
@@ -766,7 +770,7 @@
             var dayNames = [];
             var tableRows = document.querySelectorAll('#timetableGrid tbody tr');
             tableRows.forEach(function (row) {
-                var fc = row.querySelector('td.day-cell');
+                var fc = row.querySelector('.day-cell');
                 if (fc) {
                     var d = fc.textContent.trim();
                     if (d) dayNames.push(d);
@@ -777,7 +781,7 @@
             function buildDetailedSchedule() {
                 var sched = {};
                 tableRows.forEach(function (row) {
-                    var cells = row.querySelectorAll('td');
+                    var cells = row.querySelectorAll('td, th');
                     if (cells.length < 2) return;
                     var day = cells[0].textContent.trim();
                     sched[day] = [];

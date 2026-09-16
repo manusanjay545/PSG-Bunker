@@ -919,6 +919,8 @@ h2 {
     top: 0;
     z-index: 1;
     font-size: 0.8rem;
+    cursor: default;
+    user-select: none;
 }
 
 .timetable thead th:first-child {
@@ -939,7 +941,7 @@ h2 {
     background-color: rgba(74, 158, 255, 0.08);
 }
 
-.timetable tbody td {
+.timetable tbody td, .timetable tbody th {
     padding: 0.75rem 0.85rem;
     text-align: center;
     border-bottom: 1px solid #333;
@@ -949,6 +951,7 @@ h2 {
     white-space: nowrap;
 }
 
+.timetable tbody th.day-cell,
 .timetable tbody td.day-cell {
     font-weight: 700;
     color: #4a9eff;
@@ -959,6 +962,9 @@ h2 {
     letter-spacing: 0.5px;
     white-space: nowrap;
     min-width: 80px;
+    cursor: default;
+    user-select: none;
+    pointer-events: none;
 }
 
 .timetable tbody td.has-class {
