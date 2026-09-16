@@ -1041,29 +1041,6 @@
                     });
                 });
             }
-            dayNames.forEach(function (day) {
-                var btn = document.createElement('button');
-                btn.className = 'day-toggle';
-                btn.textContent = day;
-                btn.addEventListener('click', function () {
-                    if (selectedDays[day]) {
-                        delete selectedDays[day];
-                        btn.classList.remove('active');
-                    } else {
-                        selectedDays[day] = true;
-                        btn.classList.add('active');
-                    }
-                    updatePrediction();
-                });
-                bunkBtnContainer.appendChild(btn);
-            });
-
-            document.getElementById('weeksDown').addEventListener('click', function () {
-                if (weeksCount > 1) { weeksCount--; weeksValEl.textContent = weeksCount; updatePrediction(); }
-            });
-            document.getElementById('weeksUp').addEventListener('click', function () {
-                if (weeksCount < 20) { weeksCount++; weeksValEl.textContent = weeksCount; updatePrediction(); }
-            });
 
             // Calculate effective attendance taking Medical Exception into account
             function getEffectiveSubjectValues(att) {
@@ -1308,6 +1285,28 @@
                 html += '<div class="summary-card"><div class="summary-label">Must Attend</div><div class="summary-val ' + (totalMustAttend > 0 ? 'pct-d' : 'pct-s') + '">' + totalMustAttend + ' <span style="font-size:0.85rem;">classes</span></div><div class="summary-sub">' + dangerCount + ' subject' + (dangerCount !== 1 ? 's' : '') + ' in danger</div></div>';
                 html += '</div>';
 
+                function checkIsBunkedDay(day) {
+                    if (activeInputMode === 'calendar') {
+                        return Object.keys(selectedCalendarDates).some(function (dateIso) {
+                            var parts = dateIso.split('-');
+                            var dt = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                            return getDayNameFromDate(dt) === day;
+                        });
+                    } else if (activeInputMode === 'timetable') {
+                        return Object.keys(selectedTimetableCells).some(function (cellKey) {
+                            return cellKey.indexOf(day + '_') === 0;
+                        });
+                    } else if (activeInputMode === 'subjects') {
+                        var items = sched[day] || [];
+                        return items.some(function (item) {
+                            if (!item.subjectCode) return false;
+                            var att = matchSubject(item.subjectCode);
+                            return att && customSubjectBunks[att.name] > 0;
+                        });
+                    }
+                    return false;
+                }
+
                 if (currentView === 'subject') {
                     // ====== VIEW 1: SUBJECT-WISE ======
                     html += '<div class="bunk-table-wrap"><table class="bunk-table">';
@@ -1353,7 +1352,7 @@
                             daySubjMap[key].count++;
                         });
 
-                        var isBunkedDay = !!selectedDays[day];
+                        var isBunkedDay = checkIsBunkedDay(day);
                         html += '<div class="day-card ' + (isBunkedDay ? 'day-bunked' : '') + '">';
                         html += '<div class="day-card-header">';
                         html += '<h3>' + day + '</h3>';
@@ -1409,7 +1408,7 @@
                     html += '</tr></thead><tbody>';
 
                     dayNames.forEach(function (day) {
-                        var isBunkedDay = !!selectedDays[day];
+                        var isBunkedDay = checkIsBunkedDay(day);
                         var items = sched[day] || [];
 
                         html += '<tr class="' + (isBunkedDay ? 'pm-row-bunked' : '') + '">';
