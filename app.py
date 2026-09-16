@@ -28,6 +28,9 @@ def login():
         else:
             return render_template("index.html", error="Roll number and password are required")
 
+    rollno = str(rollno).strip().upper()
+    password = str(password).strip()
+
     result = return_attendance(rollno, password)
 
     if isinstance(result, str):

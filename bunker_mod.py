@@ -58,6 +58,9 @@ def return_attendance(username, pwd):
         token_input = soup.find("input", {"name": "__RequestVerificationToken"})
         token = token_input["value"] if token_input else ""
 
+        username = str(username).strip().upper() if username else ""
+        pwd = str(pwd).strip() if pwd else ""
+
         payload = {
             "rollno": username,
             "password": pwd,
@@ -80,14 +83,23 @@ def return_attendance(username, pwd):
         print(f"[DEBUG] Form inputs found on response page: {input_names}")
 
         if login_soup.find("input", {"id": "rollno"}) and login_soup.find("input", {"id": "password"}):
-            # Debug: Check if there's an error message shown on the page
+            # Check for specific error message shown on the eCampus response page
+            error_msg = None
             error_spans = login_soup.find_all("span", {"class": "text-danger"})
             for span in error_spans:
-                print(f"[DEBUG] eCampus error message: {span.get_text(strip=True)}")
-            error_divs = login_soup.find_all("div", {"class": lambda c: c and "alert" in str(c).lower()})
-            for div in error_divs:
-                print(f"[DEBUG] eCampus alert: {div.get_text(strip=True)}")
-            return "Invalid Password"
+                txt = span.get_text(strip=True)
+                if txt and not txt.startswith("*"):
+                    error_msg = txt
+                    break
+            if not error_msg:
+                error_divs = login_soup.find_all("div", {"class": lambda c: c and "alert" in str(c).lower()})
+                for div in error_divs:
+                    txt = div.get_text(strip=True)
+                    if txt:
+                        error_msg = txt
+                        break
+
+            return error_msg if error_msg else "Invalid Password"
 
         # Try to extract student name from post-login page
         student_name = _extract_name_from_soup(login_soup)
