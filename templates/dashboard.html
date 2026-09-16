@@ -220,45 +220,6 @@
             </div>
         </section>
 
-        <section class="timetable-section">
-            <h2>🗓️ Weekly Timetable</h2>
-            {% if timetable and timetable.headers %}
-            <div class="timetable-wrapper">
-                <div class="timetable-scroll">
-                    <table class="timetable" id="timetableGrid">
-                        <thead>
-                            <tr>
-                                {% for header in timetable.headers %}
-                                <th>{{ header }}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in timetable.rows %}
-                            <tr>
-                                {% for cell in row %}
-                                {% if loop.index0 == 0 %}
-                                <td class="day-cell">{{ cell }}</td>
-                                {% elif cell %}
-                                <td class="has-class" data-subject="{{ cell.strip() }}">{{ cell }}</td>
-                                {% else %}
-                                <td class="empty-cell">{{ cell }}</td>
-                                {% endif %}
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% else %}
-            <div class="no-timetable">
-                <p>📭 Timetable data is not available at the moment.</p>
-            </div>
-            {% endif %}
-
-        </section>
-
         <section class="attendance-section">
             <div class="attendance-header">
                 <h2>📚 Subject-wise Attendance</h2>
@@ -318,6 +279,60 @@
                 </div>
                 {% endfor %}
             </div>
+
+            {% if timetable and timetable.headers %}
+            <!-- Integrated Timetable inside Subject-wise Attendance -->
+            <div class="tt-integrated-card">
+                <div class="tt-integrated-header" id="ttToggleHeader">
+                    <div class="tt-header-left">
+                        <span class="tt-header-icon">🗓️</span>
+                        <div>
+                            <h3 class="tt-header-title">Weekly Timetable</h3>
+                            <p class="tt-header-sub">Color-coded by attendance status</p>
+                        </div>
+                    </div>
+                    <button class="tt-toggle-btn" id="ttToggleBtn" aria-label="Toggle timetable">
+                        <svg class="tt-chevron" id="ttChevron" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M5 8L10 13L15 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="tt-integrated-body" id="ttBody">
+                    <div class="tt-legend">
+                        <span class="tt-legend-item"><span class="tt-legend-dot tt-dot-green"></span> ≥80%</span>
+                        <span class="tt-legend-item"><span class="tt-legend-dot tt-dot-orange"></span> 75–79%</span>
+                        <span class="tt-legend-item"><span class="tt-legend-dot tt-dot-red"></span> &lt;75%</span>
+                    </div>
+                    <div class="timetable-scroll">
+                        <table class="timetable" id="timetableGrid">
+                            <thead>
+                                <tr>
+                                    {% for header in timetable.headers %}
+                                    <th>{{ header }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in timetable.rows %}
+                                <tr>
+                                    {% for cell in row %}
+                                    {% if loop.index0 == 0 %}
+                                    <td class="day-cell">{{ cell }}</td>
+                                    {% elif cell %}
+                                    <td class="has-class" data-subject="{{ cell.strip() }}">{{ cell }}</td>
+                                    {% else %}
+                                    <td class="empty-cell">{{ cell }}</td>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             {% endif %}
         </section>
 
@@ -721,6 +736,21 @@
 
         // Initial coloring with default 75% threshold
         colorTimetableCells(75);
+    </script>
+
+    <script>
+        // ====== TIMETABLE TOGGLE ======
+        (function () {
+            var toggleHeader = document.getElementById('ttToggleHeader');
+            var toggleBody = document.getElementById('ttBody');
+            var chevron = document.getElementById('ttChevron');
+            if (!toggleHeader || !toggleBody || !chevron) return;
+
+            toggleHeader.addEventListener('click', function () {
+                toggleBody.classList.toggle('collapsed');
+                chevron.classList.toggle('collapsed');
+            });
+        })();
     </script>
 
     <script>
