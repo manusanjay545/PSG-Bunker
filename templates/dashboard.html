@@ -30,6 +30,10 @@
         .bunk-mode-btn:hover { color: #ccc; }
         .bunk-mode-btn.active { background: #333; color: #4a9eff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 
+        /* Bunk Predictor Header Toggles */
+        .bunk-predictor-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem; }
+        .bunk-predictor-toggles { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+
         /* Calendar Controls & Widget */
         .calendar-widget { background: #222; border: 1px solid #333; border-radius: 12px; padding: 1.25rem; max-width: 480px; margin-bottom: 1.5rem; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
@@ -45,6 +49,16 @@
         .cal-date-cell.today-date { border-color: #4a9eff; color: #4a9eff; }
         .cal-date-cell.selected-leave { background: linear-gradient(135deg, #f44336, #d32f2f) !important; color: #fff !important; border-color: #f44336 !important; box-shadow: 0 3px 10px rgba(244,67,54,0.4); }
         .cal-cell-periods { font-size: 0.62rem; opacity: 0.8; margin-top: 0.1rem; font-weight: 400; }
+
+        /* Timetable Period Selector Matrix */
+        .tt-select-matrix-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #333; margin-bottom: 1.5rem; }
+        .tt-select-matrix { width: 100%; border-collapse: collapse; min-width: 650px; text-align: center; }
+        .tt-select-matrix th { font-size: 0.7rem; color: #777; text-transform: uppercase; background: #222; padding: 0.65rem 0.5rem; border-bottom: 1px solid #333; border-right: 1px solid #2d2d2d; }
+        .tt-select-matrix td { padding: 0.5rem 0.4rem; font-size: 0.78rem; border-bottom: 1px solid #2a2a2a; border-right: 1px solid #2a2a2a; vertical-align: middle; }
+        .tt-cell-btn { padding: 0.45rem 0.5rem; border-radius: 7px; background: #1c1c1c; border: 1px solid #333; color: #aaa; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; transition: all 0.2s ease; user-select: none; width: 100%; }
+        .tt-cell-btn:hover { border-color: #f44336; color: #f44336; background: rgba(244,67,54,0.08); }
+        .tt-cell-btn.selected-bunk-cell { background: linear-gradient(135deg, #f44336, #d32f2f) !important; color: #fff !important; border-color: #f44336 !important; box-shadow: 0 2px 8px rgba(244,67,54,0.35); }
+        .tt-cell-code { font-weight: 700; font-size: 0.78rem; }
 
         /* Selected Dates Tag Cloud */
         .selected-dates-box { margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid #333; }
@@ -309,12 +323,35 @@
 
         {% if not attendance_unavailable and attendance and timetable and timetable.headers %}
         <section class="bunk-predictor-section">
-            <h2>🔮 Bunk Predictor</h2>
-            <p class="predictor-subtitle">Plan your leave using an interactive calendar, weekday selector, or individual subject counters — then see remaining bunkable classes subject-wise, day-wise, and period-wise!</p>
+            <div class="bunk-predictor-header">
+                <div>
+                    <h2>🔮 Bunk Predictor</h2>
+                    <p class="predictor-subtitle">Plan your leave using an interactive calendar, timetable period selector, weekday selector, or individual subject counters!</p>
+                </div>
+
+                <!-- Bunk Predictor Header Toggles -->
+                <div class="bunk-predictor-toggles">
+                    <div class="percentage-toggle">
+                        <span class="toggle-label">Medical Exception</span>
+                        <div class="toggle-switch">
+                            <button class="toggle-btn btn-med-without active" onclick="setMedicalException(false)">Without</button>
+                            <button class="toggle-btn btn-med-with" onclick="setMedicalException(true)">With</button>
+                        </div>
+                    </div>
+                    <div class="percentage-toggle">
+                        <span class="toggle-label">Percentage</span>
+                        <div class="toggle-switch">
+                            <button class="toggle-btn btn-th-75 active" onclick="setThreshold(75)">75%</button>
+                            <button class="toggle-btn btn-th-80" onclick="setThreshold(80)">80%</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Mode Switcher -->
             <div class="bunk-mode-switcher">
                 <button class="bunk-mode-btn active" data-mode="calendar">📅 Calendar View</button>
+                <button class="bunk-mode-btn" data-mode="timetable">🗓️ Timetable Periods</button>
                 <button class="bunk-mode-btn" data-mode="days">🔄 Weekdays & Weeks</button>
                 <button class="bunk-mode-btn" data-mode="subjects">📚 Subject-by-Subject</button>
             </div>
@@ -338,6 +375,12 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Mode 2: Timetable Period Selector -->
+            <div id="timetableModeContainer" style="display:none;">
+                <div style="font-size:0.8rem; color:#aaa; margin-bottom:0.8rem;">Click specific timetable periods below to mark them for bunking:</div>
+                <div class="tt-select-matrix-wrap" id="ttSelectMatrixWrap"></div>
             </div>
 
             <!-- Mode 2: Weekdays & Weeks -->
@@ -588,15 +631,15 @@
 
         function setThreshold(value) {
             currentThreshold = value;
-            document.getElementById('btn75').classList.toggle('active', value === 75);
-            document.getElementById('btn80').classList.toggle('active', value === 80);
+            document.querySelectorAll('#btn75, .btn-th-75').forEach(function (b) { b.classList.toggle('active', value === 75); });
+            document.querySelectorAll('#btn80, .btn-th-80').forEach(function (b) { b.classList.toggle('active', value === 80); });
             recalculateAll();
         }
 
         function setMedicalException(withException) {
             medicalExceptionIncluded = withException;
-            document.getElementById('btnMedWith').classList.toggle('active', withException);
-            document.getElementById('btnMedWithout').classList.toggle('active', !withException);
+            document.querySelectorAll('#btnMedWithout, .btn-med-without').forEach(function (b) { b.classList.toggle('active', !withException); });
+            document.querySelectorAll('#btnMedWith, .btn-med-with').forEach(function (b) { b.classList.toggle('active', withException); });
             recalculateAll();
         }
     </script>
@@ -723,6 +766,9 @@
             // Custom individual subject bunks: { "20MA101": 2 }
             var customSubjectBunks = {};
 
+            // Selected Timetable Period Cells: { "MON_1": true, "WED_3": true }
+            var selectedTimetableCells = {};
+
             // Extract timetable headers (Periods/Times)
             var periodHeaders = [];
             var thElements = document.querySelectorAll('#timetableGrid thead th');
@@ -805,6 +851,7 @@
                     activeInputMode = btn.getAttribute('data-mode');
 
                     document.getElementById('calendarModeContainer').style.display = activeInputMode === 'calendar' ? 'block' : 'none';
+                    document.getElementById('timetableModeContainer').style.display = activeInputMode === 'timetable' ? 'block' : 'none';
                     document.getElementById('daysModeContainer').style.display = activeInputMode === 'days' ? 'block' : 'none';
                     document.getElementById('subjectsModeContainer').style.display = activeInputMode === 'subjects' ? 'block' : 'none';
 
@@ -966,7 +1013,58 @@
                 });
             }
 
-            // ====== MODE 2: DAYS & WEEKS SETUP ======
+            // ====== MODE 2: INTERACTIVE TIMETABLE PERIOD SELECTOR ======
+            function renderTimetableSelectorMatrix() {
+                var container = document.getElementById('ttSelectMatrixWrap');
+                if (!container) return;
+
+                var sched = buildDetailedSchedule();
+                var html = '<table class="tt-select-matrix"><thead><tr>';
+                periodHeaders.forEach(function (h) {
+                    html += '<th>' + h + '</th>';
+                });
+                html += '</tr></thead><tbody>';
+
+                dayNames.forEach(function (day) {
+                    var items = sched[day] || [];
+                    html += '<tr><td><strong>' + day + '</strong></td>';
+
+                    items.forEach(function (item) {
+                        if (!item.subjectCode) {
+                            html += '<td class="pm-cell-free">—</td>';
+                        } else {
+                            var cellKey = day + '_' + item.periodIndex;
+                            var isSel = !!selectedTimetableCells[cellKey];
+                            var att = matchSubject(item.subjectCode);
+                            var code = att ? att.name : item.subjectCode;
+
+                            html += '<td>';
+                            html += '<button class="tt-cell-btn ' + (isSel ? 'selected-bunk-cell' : '') + '" data-cellkey="' + cellKey + '">';
+                            html += '<span class="tt-cell-code">' + code + '</span>';
+                            html += '<span class="tt-cell-subtag">' + (isSel ? '🚨 BUNKING' : item.periodName) + '</span>';
+                            html += '</button></td>';
+                        }
+                    });
+
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+
+                container.querySelectorAll('.tt-cell-btn').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        var ck = btn.getAttribute('data-cellkey');
+                        if (selectedTimetableCells[ck]) {
+                            delete selectedTimetableCells[ck];
+                        } else {
+                            selectedTimetableCells[ck] = true;
+                        }
+                        renderTimetableSelectorMatrix();
+                        updatePrediction();
+                    });
+                });
+            }
             dayNames.forEach(function (day) {
                 var btn = document.createElement('button');
                 btn.className = 'day-toggle';
@@ -1068,6 +1166,8 @@
                 var hasSelection = false;
                 if (activeInputMode === 'calendar') {
                     hasSelection = Object.keys(selectedCalendarDates).length > 0;
+                } else if (activeInputMode === 'timetable') {
+                    hasSelection = Object.keys(selectedTimetableCells).length > 0;
                 } else if (activeInputMode === 'days') {
                     hasSelection = Object.keys(selectedDays).length > 0;
                 } else if (activeInputMode === 'subjects') {
@@ -1076,7 +1176,7 @@
 
                 if (!hasSelection) {
                     if (tabsContainer) tabsContainer.style.display = 'none';
-                    resultsBox.innerHTML = '<div class="bunk-empty"><span class="bunk-empty-icon">👆</span>Select dates or days above to calculate attendance predictions!</div>';
+                    resultsBox.innerHTML = '<div class="bunk-empty"><span class="bunk-empty-icon">👆</span>Select dates, timetable periods, or days above to calculate attendance predictions!</div>';
                     return;
                 }
 
@@ -1120,6 +1220,21 @@
                             if (!subjectMissed[key]) subjectMissed[key] = 0;
                             subjectMissed[key]++;
                         });
+                    });
+                } else if (activeInputMode === 'timetable') {
+                    // Calculate from selected timetable period cells
+                    Object.keys(selectedTimetableCells).forEach(function (cellKey) {
+                        var parts = cellKey.split('_');
+                        var day = parts[0];
+                        var pIdx = parseInt(parts[1]);
+                        var items = sched[day] || [];
+                        var item = items.find(function (it) { return it.periodIndex === pIdx; });
+                        if (!item || !item.subjectCode) return;
+                        var att = matchSubject(item.subjectCode);
+                        if (!att) return;
+                        var key = att.name;
+                        if (!subjectMissed[key]) subjectMissed[key] = 0;
+                        subjectMissed[key]++;
                     });
                 } else if (activeInputMode === 'days') {
                     // Calculate from selected weekdays & weeks
@@ -1351,9 +1466,10 @@
                 resultsBox.innerHTML = html;
             }
 
-            // Init calendar & subject selectors
+            // Init calendar, timetable matrix & subject selectors
             renderCalendar();
             updateSelectedDateTags();
+            renderTimetableSelectorMatrix();
             renderSubjectSelectors();
 
             window.updateBunkPrediction = updatePrediction;
