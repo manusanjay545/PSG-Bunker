@@ -350,14 +350,19 @@
 
             <!-- Mode Switcher -->
             <div class="bunk-mode-switcher">
-                <button class="bunk-mode-btn active" data-mode="calendar">📅 Calendar View</button>
+                <button class="bunk-mode-btn active" data-mode="subjects">📚 Subject-by-Subject</button>
+                <button class="bunk-mode-btn" data-mode="calendar">📅 Calendar View</button>
                 <button class="bunk-mode-btn" data-mode="timetable">🗓️ Timetable Periods</button>
-                <button class="bunk-mode-btn" data-mode="days">🔄 Weekdays & Weeks</button>
-                <button class="bunk-mode-btn" data-mode="subjects">📚 Subject-by-Subject</button>
             </div>
 
-            <!-- Mode 1: Calendar View -->
-            <div id="calendarModeContainer">
+            <!-- Mode 1: Individual Subject Selector (Default First) -->
+            <div id="subjectsModeContainer" style="display:block;">
+                <div style="font-size:0.8rem; color:#888; margin-bottom:0.8rem;">Set how many classes/hours you plan to bunk for each subject:</div>
+                <div class="subj-selector-grid" id="subjSelectorGrid"></div>
+            </div>
+
+            <!-- Mode 2: Calendar View -->
+            <div id="calendarModeContainer" style="display:none;">
                 <div class="calendar-widget">
                     <div class="cal-header">
                         <button class="cal-nav-btn" id="calPrevBtn">‹</button>
@@ -377,34 +382,10 @@
                 </div>
             </div>
 
-            <!-- Mode 2: Timetable Period Selector -->
+            <!-- Mode 3: Timetable Period Selector -->
             <div id="timetableModeContainer" style="display:none;">
                 <div style="font-size:0.8rem; color:#aaa; margin-bottom:0.8rem;">Click specific timetable periods below to mark them for bunking:</div>
                 <div class="tt-select-matrix-wrap" id="ttSelectMatrixWrap"></div>
-            </div>
-
-            <!-- Mode 2: Weekdays & Weeks -->
-            <div id="daysModeContainer" style="display:none;">
-                <div class="predictor-controls">
-                    <div class="control-group">
-                        <span class="control-label">Days to Bunk</span>
-                        <div class="day-buttons" id="bunkDayBtns"></div>
-                    </div>
-                    <div class="control-group">
-                        <span class="control-label">Number of Weeks</span>
-                        <div class="weeks-control">
-                            <button class="weeks-btn" id="weeksDown">−</button>
-                            <span class="weeks-value" id="weeksVal">1</span>
-                            <button class="weeks-btn" id="weeksUp">+</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mode 3: Individual Subject Selector -->
-            <div id="subjectsModeContainer" style="display:none;">
-                <div style="font-size:0.8rem; color:#888; margin-bottom:0.8rem;">Set how many classes/hours you plan to bunk for each subject:</div>
-                <div class="subj-selector-grid" id="subjSelectorGrid"></div>
             </div>
 
             <!-- View Tabs -->
@@ -745,17 +726,13 @@
     <script>
         // ====== BUNK PREDICTOR ======
         (function () {
-            var bunkBtnContainer = document.getElementById('bunkDayBtns');
-            var weeksValEl = document.getElementById('weeksVal');
             var resultsBox = document.getElementById('bunkResultsBox');
             var tabsContainer = document.getElementById('bunkViewTabs');
-            if (!bunkBtnContainer || !resultsBox) return;
+            if (!resultsBox) return;
 
             var bunkAttData = {{ attendance | tojson }};
-            var selectedDays = {};
-            var weeksCount = 1;
             var currentView = 'subject'; // 'subject', 'day', 'period'
-            var activeInputMode = 'calendar'; // 'calendar', 'days', 'subjects'
+            var activeInputMode = 'subjects'; // Default to 'subjects' first!
 
             // Calendar state
             var calCurrentDate = new Date();
@@ -850,10 +827,9 @@
                     btn.classList.add('active');
                     activeInputMode = btn.getAttribute('data-mode');
 
+                    document.getElementById('subjectsModeContainer').style.display = activeInputMode === 'subjects' ? 'block' : 'none';
                     document.getElementById('calendarModeContainer').style.display = activeInputMode === 'calendar' ? 'block' : 'none';
                     document.getElementById('timetableModeContainer').style.display = activeInputMode === 'timetable' ? 'block' : 'none';
-                    document.getElementById('daysModeContainer').style.display = activeInputMode === 'days' ? 'block' : 'none';
-                    document.getElementById('subjectsModeContainer').style.display = activeInputMode === 'subjects' ? 'block' : 'none';
 
                     updatePrediction();
                 });
@@ -1164,19 +1140,17 @@
             // Main prediction calculation
             function updatePrediction() {
                 var hasSelection = false;
-                if (activeInputMode === 'calendar') {
+                if (activeInputMode === 'subjects') {
+                    hasSelection = Object.values(customSubjectBunks).some(function (v) { return v > 0; });
+                } else if (activeInputMode === 'calendar') {
                     hasSelection = Object.keys(selectedCalendarDates).length > 0;
                 } else if (activeInputMode === 'timetable') {
                     hasSelection = Object.keys(selectedTimetableCells).length > 0;
-                } else if (activeInputMode === 'days') {
-                    hasSelection = Object.keys(selectedDays).length > 0;
-                } else if (activeInputMode === 'subjects') {
-                    hasSelection = Object.values(customSubjectBunks).some(function (v) { return v > 0; });
                 }
 
                 if (!hasSelection) {
                     if (tabsContainer) tabsContainer.style.display = 'none';
-                    resultsBox.innerHTML = '<div class="bunk-empty"><span class="bunk-empty-icon">👆</span>Select dates, timetable periods, or days above to calculate attendance predictions!</div>';
+                    resultsBox.innerHTML = '<div class="bunk-empty"><span class="bunk-empty-icon">👆</span>Set subject bunks or select dates above to calculate attendance predictions!</div>';
                     return;
                 }
 
