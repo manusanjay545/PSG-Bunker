@@ -51,14 +51,22 @@
         .cal-cell-periods { font-size: 0.62rem; opacity: 0.8; margin-top: 0.1rem; font-weight: 400; }
 
         /* Timetable Period Selector Matrix */
-        .tt-select-matrix-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #333; margin-bottom: 1.5rem; }
-        .tt-select-matrix { width: 100%; border-collapse: collapse; min-width: 650px; text-align: center; }
-        .tt-select-matrix th { font-size: 0.7rem; color: #777; text-transform: uppercase; background: #222; padding: 0.65rem 0.5rem; border-bottom: 1px solid #333; border-right: 1px solid #2d2d2d; }
-        .tt-select-matrix td { padding: 0.5rem 0.4rem; font-size: 0.78rem; border-bottom: 1px solid #2a2a2a; border-right: 1px solid #2a2a2a; vertical-align: middle; }
-        .tt-cell-btn { padding: 0.45rem 0.5rem; border-radius: 7px; background: #1c1c1c; border: 1px solid #333; color: #aaa; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; transition: all 0.2s ease; user-select: none; width: 100%; }
-        .tt-cell-btn:hover { border-color: #f44336; color: #f44336; background: rgba(244,67,54,0.08); }
-        .tt-cell-btn.selected-bunk-cell { background: linear-gradient(135deg, #f44336, #d32f2f) !important; color: #fff !important; border-color: #f44336 !important; box-shadow: 0 2px 8px rgba(244,67,54,0.35); }
-        .tt-cell-code { font-weight: 700; font-size: 0.78rem; }
+        .tt-select-matrix-wrap, .period-matrix-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #333; background: #181818; box-shadow: 0 8px 24px rgba(0,0,0,0.4); margin-bottom: 1.5rem; }
+        .tt-select-matrix, .period-matrix { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 680px; text-align: center; }
+        .tt-select-matrix th, .period-matrix th { background: #222; color: #888; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.75rem 0.6rem; border-bottom: 1px solid #333; border-right: 1px solid #2a2a2a; user-select: none; }
+        .tt-matrix-corner-head { background: #1a1a1a !important; color: #4a9eff !important; font-weight: 800 !important; letter-spacing: 0.8px !important; font-size: 0.72rem !important; border-right: 2px solid #333 !important; text-align: center; }
+        .tt-matrix-period-head { color: #aaa !important; }
+        .tt-matrix-day-head { background: #1c1c1c !important; color: #4a9eff !important; font-weight: 800 !important; font-size: 0.8rem !important; letter-spacing: 0.5px !important; padding: 0.6rem 0.8rem !important; border-right: 2px solid #333 !important; border-bottom: 1px solid #2a2a2a !important; text-align: center; vertical-align: middle; user-select: none; }
+        .tt-select-matrix td, .period-matrix td { padding: 0.45rem; border-bottom: 1px solid #2a2a2a; border-right: 1px solid #2a2a2a; vertical-align: middle; }
+        .tt-select-matrix tr:last-child td, .tt-select-matrix tr:last-child th, .period-matrix tr:last-child td, .period-matrix tr:last-child th { border-bottom: none; }
+        .tt-select-matrix td:last-child, .tt-select-matrix th:last-child, .period-matrix td:last-child, .period-matrix th:last-child { border-right: none; }
+        .tt-cell-btn { padding: 0.55rem 0.6rem; border-radius: 8px; background: #202020; border: 1px solid #353535; color: #ccc; cursor: pointer; font-size: 0.78rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; transition: all 0.2s cubic-bezier(0.4,0,0.2,1); user-select: none; width: 100%; min-height: 52px; }
+        .tt-cell-btn:hover { border-color: #f44336; color: #ff8a80; background: rgba(244,67,54,0.12); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(244,67,54,0.2); }
+        .tt-cell-btn:active { transform: translateY(0); }
+        .tt-cell-btn.selected-bunk-cell { background: linear-gradient(135deg, #f44336, #c62828) !important; color: #ffffff !important; border-color: #f44336 !important; box-shadow: 0 4px 14px rgba(244,67,54,0.45); }
+        .tt-cell-code { font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; }
+        .tt-cell-subtag { font-size: 0.65rem; font-weight: 600; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.4px; }
+        .selected-bunk-cell .tt-cell-subtag { opacity: 1; font-weight: 800; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
 
         /* Selected Dates Tag Cloud */
         .selected-dates-box { margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid #333; }
@@ -997,14 +1005,18 @@
 
                 var sched = buildDetailedSchedule();
                 var html = '<table class="tt-select-matrix"><thead><tr>';
-                periodHeaders.forEach(function (h) {
-                    html += '<th>' + h + '</th>';
+                periodHeaders.forEach(function (h, idx) {
+                    if (idx === 0) {
+                        html += '<th class="tt-matrix-corner-head">' + h + '</th>';
+                    } else {
+                        html += '<th class="tt-matrix-period-head">' + h + '</th>';
+                    }
                 });
                 html += '</tr></thead><tbody>';
 
                 dayNames.forEach(function (day) {
                     var items = sched[day] || [];
-                    html += '<tr><td><strong>' + day + '</strong></td>';
+                    html += '<tr><th class="tt-matrix-day-head" scope="row">' + day + '</th>';
 
                     items.forEach(function (item) {
                         if (!item.subjectCode) {
@@ -1016,9 +1028,9 @@
                             var code = att ? att.name : item.subjectCode;
 
                             html += '<td>';
-                            html += '<button class="tt-cell-btn ' + (isSel ? 'selected-bunk-cell' : '') + '" data-cellkey="' + cellKey + '">';
+                            html += '<button class="tt-cell-btn ' + (isSel ? 'selected-bunk-cell' : '') + '" data-cellkey="' + cellKey + '" type="button">';
                             html += '<span class="tt-cell-code">' + code + '</span>';
-                            html += '<span class="tt-cell-subtag">' + (isSel ? '🚨 BUNKING' : item.periodName) + '</span>';
+                            html += '<span class="tt-cell-subtag">' + (isSel ? '🚨 BUNKING' : 'Tap to Bunk') + '</span>';
                             html += '</button></td>';
                         }
                     });
@@ -1405,8 +1417,12 @@
                     // ====== VIEW 3: PERIOD-WISE SCHEDULE MATRIX ======
                     html += '<div class="period-matrix-wrap"><table class="period-matrix">';
                     html += '<thead><tr>';
-                    periodHeaders.forEach(function (h) {
-                        html += '<th>' + h + '</th>';
+                    periodHeaders.forEach(function (h, idx) {
+                        if (idx === 0) {
+                            html += '<th class="tt-matrix-corner-head">' + h + '</th>';
+                        } else {
+                            html += '<th class="tt-matrix-period-head">' + h + '</th>';
+                        }
                     });
                     html += '</tr></thead><tbody>';
 
@@ -1415,7 +1431,7 @@
                         var items = sched[day] || [];
 
                         html += '<tr class="' + (isBunkedDay ? 'pm-row-bunked' : '') + '">';
-                        html += '<td><strong>' + day + '</strong></td>';
+                        html += '<th class="tt-matrix-day-head" scope="row">' + day + '</th>';
 
                         items.forEach(function (item) {
                             if (!item.subjectCode) {
