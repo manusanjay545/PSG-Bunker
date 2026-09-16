@@ -198,10 +198,8 @@
                             </svg>
                             Share App
                         </button>
-                        <button onclick="downloadApp()" class="btn btn--gradient download-btn-dashboard">
-                            <img src="{{ url_for('static', filename='favicon.ico') }}" alt="App Icon"
-                                class="btn-icon-small">
-                            Download App
+                        <button onclick="scrollToBunkPredictor()" class="btn btn--gradient bunk-predictor-nav-btn">
+                            🔮 Bunk Predictor
                         </button>
                         <a href="/" class="btn btn--secondary logout-btn">Logout</a>
                     </div>
@@ -333,7 +331,7 @@
         </section>
 
         {% if not attendance_unavailable and attendance and timetable and timetable.headers %}
-        <section class="bunk-predictor-section">
+        <section class="bunk-predictor-section" id="bunkPredictorSection">
             <div class="bunk-predictor-header">
                 <div>
                     <h2>🔮 Bunk Predictor</h2>
@@ -507,11 +505,11 @@
     </script>
 
     <script>
-        // ====== APK DOWNLOAD URL ======
-        const APK_DOWNLOAD_URL = 'https://github.com/manusanjay545/PSG-Bunker/raw/main/static/PSGBunker.apk';
-
-        function downloadApp() {
-            window.open(APK_DOWNLOAD_URL, '_blank');
+        function scrollToBunkPredictor() {
+            var el = document.getElementById('bunkPredictorSection');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         // ====== PERCENTAGE & MEDICAL EXCEPTION TOGGLE ======
