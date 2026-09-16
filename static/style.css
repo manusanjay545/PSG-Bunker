@@ -1132,6 +1132,38 @@ h2 {
     border-bottom: none;
 }
 
+/* Clickable timetable cells */
+.timetable tbody td.has-class {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.timetable tbody td.has-class:hover {
+    filter: brightness(1.3);
+    box-shadow: inset 0 0 0 2px rgba(244, 67, 54, 0.35);
+}
+
+/* Bunked cell state */
+.timetable tbody td.tt-bunked {
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.25), rgba(211, 47, 47, 0.2)) !important;
+    color: #ff8a80 !important;
+    border-left: 3px solid #f44336 !important;
+    position: relative;
+    animation: none !important;
+    box-shadow: inset 0 0 12px rgba(244, 67, 54, 0.15);
+}
+
+.timetable tbody td.tt-bunked::after {
+    content: '✕';
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    font-size: 0.6rem;
+    color: #f44336;
+    font-weight: 700;
+    opacity: 0.8;
+}
+
 /* Timetable mobile responsive */
 @media (max-width: 768px) {
     .timetable {

@@ -776,6 +776,9 @@
             // Selected Timetable Period Cells: { "MON_1": true, "WED_3": true }
             var selectedTimetableCells = {};
 
+            // Selected Attendance Timetable Cells (synced with customSubjectBunks): { "MON_2": true }
+            var selectedAttTTCells = {};
+
             // Extract timetable headers (Periods/Times)
             var periodHeaders = [];
             var thElements = document.querySelectorAll('#timetableGrid thead th');
@@ -1095,7 +1098,119 @@
                 }
             }
 
-            // ====== MODE 3: INDIVIDUAL SUBJECT SELECTOR ======
+            // ====== ATTENDANCE TIMETABLE CELL SYNC ======
+            // Recompute customSubjectBunks from selectedAttTTCells
+            function recomputeSubjectBunksFromCells() {
+                customSubjectBunks = {};
+                var sched = buildDetailedSchedule();
+                Object.keys(selectedAttTTCells).forEach(function (cellKey) {
+                    var parts = cellKey.split('_');
+                    var day = parts[0];
+                    var pIdx = parseInt(parts[1]);
+                    var items = sched[day] || [];
+                    var item = items.find(function (it) { return it.periodIndex === pIdx; });
+                    if (!item || !item.subjectCode) return;
+                    var att = matchSubject(item.subjectCode);
+                    if (!att) return;
+                    var key = att.name;
+                    if (!customSubjectBunks[key]) customSubjectBunks[key] = 0;
+                    customSubjectBunks[key]++;
+                });
+            }
+
+            // Update attendance timetable cell styling
+            function updateAttTTCellStyles() {
+                var ttCells = document.querySelectorAll('#timetableGrid tbody tr');
+                ttCells.forEach(function (row) {
+                    var cells = row.querySelectorAll('td');
+                    if (cells.length < 2) return;
+                    var dayCell = cells[0];
+                    var day = dayCell.textContent.trim();
+                    for (var i = 1; i < cells.length; i++) {
+                        var td = cells[i];
+                        var subj = td.getAttribute('data-subject');
+                        if (!subj) continue;
+                        var cellKey = day + '_' + i;
+                        if (selectedAttTTCells[cellKey]) {
+                            td.classList.add('tt-bunked');
+                        } else {
+                            td.classList.remove('tt-bunked');
+                        }
+                    }
+                });
+            }
+
+            // When + is pressed, auto-select next available timetable cell for that subject
+            function autoSelectCellForSubject(subjectKey) {
+                var sched = buildDetailedSchedule();
+                for (var d = 0; d < dayNames.length; d++) {
+                    var day = dayNames[d];
+                    var items = sched[day] || [];
+                    for (var p = 0; p < items.length; p++) {
+                        var item = items[p];
+                        if (!item.subjectCode) continue;
+                        var att = matchSubject(item.subjectCode);
+                        if (!att || att.name !== subjectKey) continue;
+                        var cellKey = day + '_' + item.periodIndex;
+                        if (!selectedAttTTCells[cellKey]) {
+                            selectedAttTTCells[cellKey] = true;
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // When - is pressed, auto-deselect last selected timetable cell for that subject
+            function autoDeselectCellForSubject(subjectKey) {
+                var sched = buildDetailedSchedule();
+                // Walk backwards to deselect the last one
+                for (var d = dayNames.length - 1; d >= 0; d--) {
+                    var day = dayNames[d];
+                    var items = sched[day] || [];
+                    for (var p = items.length - 1; p >= 0; p--) {
+                        var item = items[p];
+                        if (!item.subjectCode) continue;
+                        var att = matchSubject(item.subjectCode);
+                        if (!att || att.name !== subjectKey) continue;
+                        var cellKey = day + '_' + item.periodIndex;
+                        if (selectedAttTTCells[cellKey]) {
+                            delete selectedAttTTCells[cellKey];
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Setup click handlers on attendance timetable cells
+            function setupAttTTClickHandlers() {
+                var ttRows = document.querySelectorAll('#timetableGrid tbody tr');
+                ttRows.forEach(function (row) {
+                    var cells = row.querySelectorAll('td');
+                    if (cells.length < 2) return;
+                    var day = cells[0].textContent.trim();
+                    for (var i = 1; i < cells.length; i++) {
+                        (function (td, colIdx) {
+                            var subj = td.getAttribute('data-subject');
+                            if (!subj) return;
+                            td.style.cursor = 'pointer';
+                            td.addEventListener('click', function () {
+                                var cellKey = day + '_' + colIdx;
+                                if (selectedAttTTCells[cellKey]) {
+                                    delete selectedAttTTCells[cellKey];
+                                } else {
+                                    selectedAttTTCells[cellKey] = true;
+                                }
+                                recomputeSubjectBunksFromCells();
+                                renderSubjectSelectors();
+                                updateAttTTCellStyles();
+                                updatePrediction();
+                            });
+                        })(cells[i], i);
+                    }
+                });
+            }
+
+            // ====== MODE 1: INDIVIDUAL SUBJECT SELECTOR ======
             function renderSubjectSelectors() {
                 var grid = document.getElementById('subjSelectorGrid');
                 if (!grid) return;
@@ -1125,7 +1240,9 @@
                         var k = btn.getAttribute('data-key');
                         if (customSubjectBunks[k] > 0) {
                             customSubjectBunks[k]--;
+                            autoDeselectCellForSubject(k);
                             renderSubjectSelectors();
+                            updateAttTTCellStyles();
                             updatePrediction();
                         }
                     });
@@ -1136,7 +1253,9 @@
                         var k = btn.getAttribute('data-key');
                         if (!customSubjectBunks[k]) customSubjectBunks[k] = 0;
                         customSubjectBunks[k]++;
+                        autoSelectCellForSubject(k);
                         renderSubjectSelectors();
+                        updateAttTTCellStyles();
                         updatePrediction();
                     });
                 });
@@ -1483,8 +1602,13 @@
             updateSelectedDateTags();
             renderTimetableSelectorMatrix();
             renderSubjectSelectors();
+            setupAttTTClickHandlers();
+            updatePrediction();
 
-            window.updateBunkPrediction = updatePrediction;
+            window.updateBunkPrediction = function () {
+                updatePrediction();
+                updateAttTTCellStyles();
+            };
         })();
     </script>
 </body>
