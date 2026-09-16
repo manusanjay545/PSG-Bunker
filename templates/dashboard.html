@@ -18,11 +18,52 @@
 
     <meta name="monetag" content="c86cf967f8378e70d69668985a5dbdba">
 
-    <style>
         /* ====== Bunk Predictor Styles ====== */
         .bunk-predictor-section { margin-top: 2rem; }
         .bunk-predictor-section h2 { margin-bottom: 0.5rem; }
         .predictor-subtitle { color: #888; font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+        /* Mode Switcher Header */
+        .bunk-mode-switcher { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: #1c1c1c; padding: 0.35rem; border-radius: 10px; border: 1px solid #333; width: fit-content; flex-wrap: wrap; }
+        .bunk-mode-btn { padding: 0.55rem 1.1rem; border: none; border-radius: 7px; background: transparent; color: #888; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .bunk-mode-btn:hover { color: #ccc; }
+        .bunk-mode-btn.active { background: #333; color: #4a9eff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+        /* Calendar Controls & Widget */
+        .calendar-widget { background: #222; border: 1px solid #333; border-radius: 12px; padding: 1.25rem; max-width: 480px; margin-bottom: 1.5rem; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .cal-title { font-size: 1.05rem; font-weight: 700; color: #fff; }
+        .cal-nav-btn { background: #333; border: none; color: #ccc; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+        .cal-nav-btn:hover { background: #4a9eff; color: #fff; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3rem; text-align: center; }
+        .cal-day-head { font-size: 0.7rem; font-weight: 700; color: #777; text-transform: uppercase; padding-bottom: 0.4rem; }
+        .cal-date-cell { aspect-ratio: 1; border-radius: 8px; background: #1a1a1a; color: #bbb; font-size: 0.85rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; user-select: none; }
+        .cal-date-cell:hover:not(.other-month):not(.disabled-date) { border-color: #f44336; color: #f44336; background: rgba(244,67,54,0.08); }
+        .cal-date-cell.other-month { opacity: 0.3; cursor: default; }
+        .cal-date-cell.disabled-date { opacity: 0.25; cursor: not-allowed; }
+        .cal-date-cell.today-date { border-color: #4a9eff; color: #4a9eff; }
+        .cal-date-cell.selected-leave { background: linear-gradient(135deg, #f44336, #d32f2f) !important; color: #fff !important; border-color: #f44336 !important; box-shadow: 0 3px 10px rgba(244,67,54,0.4); }
+        .cal-cell-periods { font-size: 0.62rem; opacity: 0.8; margin-top: 0.1rem; font-weight: 400; }
+
+        /* Selected Dates Tag Cloud */
+        .selected-dates-box { margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid #333; }
+        .selected-dates-title { font-size: 0.78rem; color: #888; font-weight: 600; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .date-tags-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .date-tag { background: rgba(244,67,54,0.15); color: #f44336; border: 1px solid rgba(244,67,54,0.3); padding: 0.2rem 0.55rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; display: flex; align-items: center; gap: 0.35rem; }
+        .date-tag-remove { cursor: pointer; font-size: 0.9rem; font-weight: 700; opacity: 0.7; }
+        .date-tag-remove:hover { opacity: 1; }
+
+        /* Individual Subject Selector Grid */
+        .subj-selector-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .subj-select-card { background: #222; border: 1px solid #333; border-radius: 10px; padding: 0.9rem 1rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.8rem; }
+        .subj-select-card:hover { border-color: #4a9eff; }
+        .subj-select-title { font-size: 0.88rem; font-weight: 700; color: #fff; }
+        .subj-select-code { font-size: 0.72rem; color: #777; margin-top: 0.1rem; }
+        .subj-bunk-counter { display: flex; align-items: center; justify-content: space-between; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 0.25rem 0.4rem; }
+        .subj-bunk-btn { width: 30px; height: 30px; border: none; border-radius: 6px; background: #2d2d2d; color: #ccc; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s ease; }
+        .subj-bunk-btn:hover { background: #f44336; color: #fff; }
+        .subj-bunk-val { font-size: 1rem; font-weight: 700; color: #fff; min-width: 28px; text-align: center; }
+
         .predictor-controls { display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-end; margin-bottom: 1.5rem; }
         .control-group { display: flex; flex-direction: column; gap: 0.6rem; }
         .control-label { color: #aaa; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -268,21 +309,58 @@
         {% if not attendance_unavailable and attendance and timetable and timetable.headers %}
         <section class="bunk-predictor-section">
             <h2>🔮 Bunk Predictor</h2>
-            <p class="predictor-subtitle">Plan your leave and see exactly how many classes you can still bunk or must attend — subject-wise, day-wise, and period-wise!</p>
+            <p class="predictor-subtitle">Plan your leave using an interactive calendar, weekday selector, or individual subject counters — then see remaining bunkable classes subject-wise, day-wise, and period-wise!</p>
 
-            <div class="predictor-controls">
-                <div class="control-group">
-                    <span class="control-label">Days to Bunk</span>
-                    <div class="day-buttons" id="bunkDayBtns"></div>
-                </div>
-                <div class="control-group">
-                    <span class="control-label">Number of Weeks</span>
-                    <div class="weeks-control">
-                        <button class="weeks-btn" id="weeksDown">−</button>
-                        <span class="weeks-value" id="weeksVal">1</span>
-                        <button class="weeks-btn" id="weeksUp">+</button>
+            <!-- Mode Switcher -->
+            <div class="bunk-mode-switcher">
+                <button class="bunk-mode-btn active" data-mode="calendar">📅 Calendar View</button>
+                <button class="bunk-mode-btn" data-mode="days">🔄 Weekdays & Weeks</button>
+                <button class="bunk-mode-btn" data-mode="subjects">📚 Subject-by-Subject</button>
+            </div>
+
+            <!-- Mode 1: Calendar View -->
+            <div id="calendarModeContainer">
+                <div class="calendar-widget">
+                    <div class="cal-header">
+                        <button class="cal-nav-btn" id="calPrevBtn">‹</button>
+                        <span class="cal-title" id="calTitle">September 2026</span>
+                        <button class="cal-nav-btn" id="calNextBtn">›</button>
+                    </div>
+                    <div class="cal-grid" id="calGrid"></div>
+                    <div class="selected-dates-box" id="selectedDatesBox">
+                        <div class="selected-dates-title">
+                            <span>SELECTED LEAVE DATES (<span id="dateCount">0</span>)</span>
+                            <button id="clearDatesBtn" style="background:none; border:none; color:#f44336; font-size:0.75rem; cursor:pointer; font-weight:600; text-decoration:underline;">Clear All</button>
+                        </div>
+                        <div class="date-tags-list" id="dateTagsList">
+                            <span style="font-size:0.78rem; color:#666;">Click any date on the calendar above to mark leave</span>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Mode 2: Weekdays & Weeks -->
+            <div id="daysModeContainer" style="display:none;">
+                <div class="predictor-controls">
+                    <div class="control-group">
+                        <span class="control-label">Days to Bunk</span>
+                        <div class="day-buttons" id="bunkDayBtns"></div>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">Number of Weeks</span>
+                        <div class="weeks-control">
+                            <button class="weeks-btn" id="weeksDown">−</button>
+                            <span class="weeks-value" id="weeksVal">1</span>
+                            <button class="weeks-btn" id="weeksUp">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode 3: Individual Subject Selector -->
+            <div id="subjectsModeContainer" style="display:none;">
+                <div style="font-size:0.8rem; color:#888; margin-bottom:0.8rem;">Set how many classes/hours you plan to bunk for each subject:</div>
+                <div class="subj-selector-grid" id="subjSelectorGrid"></div>
             </div>
 
             <!-- View Tabs -->
@@ -295,7 +373,7 @@
             <div id="bunkResultsBox">
                 <div class="bunk-empty">
                     <span class="bunk-empty-icon">👆</span>
-                    Select days above to predict how many classes you can bunk or must attend!
+                    Select dates or days above to calculate attendance predictions!
                 </div>
             </div>
         </section>
@@ -633,6 +711,16 @@
             var selectedDays = {};
             var weeksCount = 1;
             var currentView = 'subject'; // 'subject', 'day', 'period'
+            var activeInputMode = 'calendar'; // 'calendar', 'days', 'subjects'
+
+            // Calendar state
+            var calCurrentDate = new Date();
+            var calMonth = calCurrentDate.getMonth();
+            var calYear = calCurrentDate.getFullYear();
+            var selectedCalendarDates = {}; // { "2026-09-18": true }
+
+            // Custom individual subject bunks: { "20MA101": 2 }
+            var customSubjectBunks = {};
 
             // Extract timetable headers (Periods/Times)
             var periodHeaders = [];
@@ -693,7 +781,191 @@
                 return null;
             }
 
-            // Render day toggle buttons
+            // Map Date.getDay() (0=Sun, 1=Mon, ...) to timetable day name
+            function getDayNameFromDate(dateObj) {
+                var dayIdx = dateObj.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+                var map = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+                var code = map[dayIdx];
+                for (var i = 0; i < dayNames.length; i++) {
+                    var dnUpper = dayNames[i].toUpperCase();
+                    if (dnUpper.indexOf(code) !== -1 || code.indexOf(dnUpper) !== -1) {
+                        return dayNames[i];
+                    }
+                }
+                return null;
+            }
+
+            // ====== MODE SWITCHER SETUP ======
+            var modeBtns = document.querySelectorAll('.bunk-mode-btn');
+            modeBtns.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    modeBtns.forEach(function (b) { b.classList.remove('active'); });
+                    btn.classList.add('active');
+                    activeInputMode = btn.getAttribute('data-mode');
+
+                    document.getElementById('calendarModeContainer').style.display = activeInputMode === 'calendar' ? 'block' : 'none';
+                    document.getElementById('daysModeContainer').style.display = activeInputMode === 'days' ? 'block' : 'none';
+                    document.getElementById('subjectsModeContainer').style.display = activeInputMode === 'subjects' ? 'block' : 'none';
+
+                    updatePrediction();
+                });
+            });
+
+            // ====== CALENDAR IMPLEMENTATION ======
+            var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            
+            function renderCalendar() {
+                var calTitle = document.getElementById('calTitle');
+                var calGrid = document.getElementById('calGrid');
+                if (!calTitle || !calGrid) return;
+
+                calTitle.textContent = monthNames[calMonth] + " " + calYear;
+                calGrid.innerHTML = '';
+
+                // Day headers (Mon..Sun)
+                var dayHeadArr = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                dayHeadArr.forEach(function (dh) {
+                    var hDiv = document.createElement('div');
+                    hDiv.className = 'cal-day-head';
+                    hDiv.textContent = dh;
+                    calGrid.appendChild(hDiv);
+                });
+
+                // First day of month & total days
+                var firstDayObj = new Date(calYear, calMonth, 1);
+                var startingDay = firstDayObj.getDay(); // 0=Sun, 1=Mon...
+                // Adjust for Mon-first grid (0=Mon, 6=Sun)
+                var offset = (startingDay === 0) ? 6 : (startingDay - 1);
+
+                var totalDaysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+                var today = new Date();
+                var todayIso = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+                var sched = buildDetailedSchedule();
+
+                // Empty cells before 1st of month
+                for (var e = 0; e < offset; e++) {
+                    var emptyCell = document.createElement('div');
+                    emptyCell.className = 'cal-date-cell other-month';
+                    calGrid.appendChild(emptyCell);
+                }
+
+                // Render month dates
+                for (var d = 1; d <= totalDaysInMonth; d++) {
+                    (function (dayNum) {
+                        var cell = document.createElement('div');
+                        cell.className = 'cal-date-cell';
+
+                        var monthStr = String(calMonth + 1).padStart(2, '0');
+                        var dayStr = String(dayNum).padStart(2, '0');
+                        var dateIso = calYear + '-' + monthStr + '-' + dayStr;
+
+                        var cellDate = new Date(calYear, calMonth, dayNum);
+                        var dayName = getDayNameFromDate(cellDate);
+
+                        // Highlight today
+                        if (dateIso === todayIso) {
+                            cell.classList.add('today-date');
+                        }
+
+                        // Check if date is selected
+                        if (selectedCalendarDates[dateIso]) {
+                            cell.classList.add('selected-leave');
+                        }
+
+                        // Periods text subtext
+                        var periodCount = 0;
+                        if (dayName && sched[dayName]) {
+                            sched[dayName].forEach(function (it) { if (it.subjectCode) periodCount++; });
+                        }
+
+                        var numSpan = document.createElement('span');
+                        numSpan.textContent = dayNum;
+                        cell.appendChild(numSpan);
+
+                        if (periodCount > 0) {
+                            var pSub = document.createElement('span');
+                            pSub.className = 'cal-cell-periods';
+                            pSub.textContent = periodCount + 'p';
+                            cell.appendChild(pSub);
+                        } else {
+                            cell.classList.add('disabled-date');
+                        }
+
+                        // Click to toggle date selection
+                        cell.addEventListener('click', function () {
+                            if (selectedCalendarDates[dateIso]) {
+                                delete selectedCalendarDates[dateIso];
+                            } else {
+                                selectedCalendarDates[dateIso] = true;
+                            }
+                            renderCalendar();
+                            updateSelectedDateTags();
+                            updatePrediction();
+                        });
+
+                        calGrid.appendChild(cell);
+                    })(d);
+                }
+            }
+
+            document.getElementById('calPrevBtn').addEventListener('click', function () {
+                calMonth--;
+                if (calMonth < 0) { calMonth = 11; calYear--; }
+                renderCalendar();
+            });
+
+            document.getElementById('calNextBtn').addEventListener('click', function () {
+                calMonth++;
+                if (calMonth > 11) { calMonth = 0; calYear++; }
+                renderCalendar();
+            });
+
+            document.getElementById('clearDatesBtn').addEventListener('click', function () {
+                selectedCalendarDates = {};
+                renderCalendar();
+                updateSelectedDateTags();
+                updatePrediction();
+            });
+
+            function updateSelectedDateTags() {
+                var listEl = document.getElementById('dateTagsList');
+                var countEl = document.getElementById('dateCount');
+                var keys = Object.keys(selectedCalendarDates).sort();
+                if (countEl) countEl.textContent = keys.length;
+
+                if (!listEl) return;
+                if (keys.length === 0) {
+                    listEl.innerHTML = '<span style="font-size:0.78rem; color:#666;">Click any date on the calendar above to mark leave</span>';
+                    return;
+                }
+
+                var html = '';
+                keys.forEach(function (iso) {
+                    var parts = iso.split('-');
+                    var dt = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    var dayName = getDayNameFromDate(dt) || '';
+                    var label = monthNames[dt.getMonth()].slice(0, 3) + ' ' + dt.getDate() + (dayName ? ' (' + dayName + ')' : '');
+
+                    html += '<div class="date-tag"><span>' + label + '</span>';
+                    html += '<span class="date-tag-remove" data-iso="' + iso + '">×</span></div>';
+                });
+
+                listEl.innerHTML = html;
+
+                listEl.querySelectorAll('.date-tag-remove').forEach(function (btn) {
+                    btn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        var iso = btn.getAttribute('data-iso');
+                        delete selectedCalendarDates[iso];
+                        renderCalendar();
+                        updateSelectedDateTags();
+                        updatePrediction();
+                    });
+                });
+            }
+
+            // ====== MODE 2: DAYS & WEEKS SETUP ======
             dayNames.forEach(function (day) {
                 var btn = document.createElement('button');
                 btn.className = 'day-toggle';
@@ -711,13 +983,58 @@
                 bunkBtnContainer.appendChild(btn);
             });
 
-            // Weeks controls
             document.getElementById('weeksDown').addEventListener('click', function () {
                 if (weeksCount > 1) { weeksCount--; weeksValEl.textContent = weeksCount; updatePrediction(); }
             });
             document.getElementById('weeksUp').addEventListener('click', function () {
                 if (weeksCount < 20) { weeksCount++; weeksValEl.textContent = weeksCount; updatePrediction(); }
             });
+
+            // ====== MODE 3: INDIVIDUAL SUBJECT SELECTOR ======
+            function renderSubjectSelectors() {
+                var grid = document.getElementById('subjSelectorGrid');
+                if (!grid) return;
+
+                var html = '';
+                bunkAttData.forEach(function (att) {
+                    var key = att.name;
+                    var val = customSubjectBunks[key] || 0;
+                    var pct = att.percentage_of_attendance;
+
+                    html += '<div class="subj-select-card">';
+                    html += '<div><div class="subj-select-title">' + (att.course_title || att.name) + '</div>';
+                    html += '<div class="subj-select-code">' + att.name + ' • Current: <span class="pct-' + pctClass(pct) + '">' + pct.toFixed(1) + '%</span></div></div>';
+
+                    html += '<div class="subj-bunk-counter">';
+                    html += '<button class="subj-bunk-btn subj-down" data-key="' + key + '">−</button>';
+                    html += '<span class="subj-bunk-val">' + val + '</span>';
+                    html += '<button class="subj-bunk-btn subj-up" data-key="' + key + '">+</button>';
+                    html += '</div></div>';
+                });
+
+                grid.innerHTML = html;
+
+                grid.querySelectorAll('.subj-down').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        var k = btn.getAttribute('data-key');
+                        if (customSubjectBunks[k] > 0) {
+                            customSubjectBunks[k]--;
+                            renderSubjectSelectors();
+                            updatePrediction();
+                        }
+                    });
+                });
+
+                grid.querySelectorAll('.subj-up').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        var k = btn.getAttribute('data-key');
+                        if (!customSubjectBunks[k]) customSubjectBunks[k] = 0;
+                        customSubjectBunks[k]++;
+                        renderSubjectSelectors();
+                        updatePrediction();
+                    });
+                });
+            }
 
             // View Tab switching
             if (tabsContainer) {
@@ -745,11 +1062,20 @@
                 return 'row-danger';
             }
 
+            // Main prediction calculation
             function updatePrediction() {
-                var anySelected = Object.keys(selectedDays).length > 0;
-                if (!anySelected) {
+                var hasSelection = false;
+                if (activeInputMode === 'calendar') {
+                    hasSelection = Object.keys(selectedCalendarDates).length > 0;
+                } else if (activeInputMode === 'days') {
+                    hasSelection = Object.keys(selectedDays).length > 0;
+                } else if (activeInputMode === 'subjects') {
+                    hasSelection = Object.values(customSubjectBunks).some(function (v) { return v > 0; });
+                }
+
+                if (!hasSelection) {
                     if (tabsContainer) tabsContainer.style.display = 'none';
-                    resultsBox.innerHTML = '<div class="bunk-empty"><span class="bunk-empty-icon">👆</span>Select days above to predict how many classes you can bunk or must attend!</div>';
+                    resultsBox.innerHTML = '<div class="bunk-empty"><span class="bunk-empty-icon">👆</span>Select dates or days above to calculate attendance predictions!</div>';
                     return;
                 }
 
@@ -758,30 +1084,68 @@
                 var sched = buildDetailedSchedule();
                 var target = currentThreshold || 75;
 
-                // Track weekly period counts per subject split by bunked vs attended
+                // Track missed and attended hours per subject
                 var subjectMissed = {};
                 var subjectAttended = {};
                 var subjectWeeklyTotal = {};
 
+                // Count weekly total periods per subject first
                 dayNames.forEach(function (day) {
                     var items = sched[day] || [];
-                    var isBunked = !!selectedDays[day];
                     items.forEach(function (item) {
                         if (!item.subjectCode) return;
                         var att = matchSubject(item.subjectCode);
                         if (!att) return;
                         var key = att.name;
-                        if (!subjectMissed[key]) subjectMissed[key] = 0;
-                        if (!subjectAttended[key]) subjectAttended[key] = 0;
                         if (!subjectWeeklyTotal[key]) subjectWeeklyTotal[key] = 0;
-
                         subjectWeeklyTotal[key]++;
-                        if (isBunked) subjectMissed[key]++;
-                        else subjectAttended[key]++;
                     });
                 });
 
-                // Calculate subject-level post-bunk numbers
+                if (activeInputMode === 'calendar') {
+                    // Calculate from selected calendar dates
+                    Object.keys(selectedCalendarDates).forEach(function (dateIso) {
+                        var parts = dateIso.split('-');
+                        var dt = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                        var dayName = getDayNameFromDate(dt);
+                        if (!dayName) return;
+
+                        var items = sched[dayName] || [];
+                        items.forEach(function (item) {
+                            if (!item.subjectCode) return;
+                            var att = matchSubject(item.subjectCode);
+                            if (!att) return;
+                            var key = att.name;
+                            if (!subjectMissed[key]) subjectMissed[key] = 0;
+                            subjectMissed[key]++;
+                        });
+                    });
+                } else if (activeInputMode === 'days') {
+                    // Calculate from selected weekdays & weeks
+                    dayNames.forEach(function (day) {
+                        var items = sched[day] || [];
+                        var isBunked = !!selectedDays[day];
+                        items.forEach(function (item) {
+                            if (!item.subjectCode) return;
+                            var att = matchSubject(item.subjectCode);
+                            if (!att) return;
+                            var key = att.name;
+                            if (!subjectMissed[key]) subjectMissed[key] = 0;
+                            if (!subjectAttended[key]) subjectAttended[key] = 0;
+
+                            if (isBunked) subjectMissed[key] += weeksCount;
+                            else subjectAttended[key] += weeksCount;
+                        });
+                    });
+                } else if (activeInputMode === 'subjects') {
+                    // Calculate from individual subject counter inputs
+                    bunkAttData.forEach(function (att) {
+                        var key = att.name;
+                        subjectMissed[key] = customSubjectBunks[key] || 0;
+                    });
+                }
+
+                // Compute predictions for each subject
                 var predictions = [];
                 var totalBunkableLeft = 0;
                 var totalMustAttend = 0;
@@ -793,39 +1157,30 @@
                     var curTotal = att.total_hours;
                     var curPresent = att.total_present;
 
-                    var missedInPlan = (subjectMissed[key] || 0) * weeksCount;
-                    var attendedInPlan = (subjectAttended[key] || 0) * weeksCount;
+                    var missedInPlan = subjectMissed[key] || 0;
+                    var attendedInPlan = subjectAttended[key] || 0;
 
-                    // Effective total and present after planned leave
                     var postTotal = curTotal + missedInPlan + attendedInPlan;
                     var postPresent = curPresent + attendedInPlan;
                     var postPct = postTotal > 0 ? (postPresent / postTotal * 100) : 0;
 
                     totalPeriodsBunked += missedInPlan;
 
-                    // Calculate remaining bunk / attend status relative to target threshold
-                    var status = ''; // 'can_bunk' or 'must_attend'
+                    var status = '';
                     var marginClasses = 0;
-                    var daysApprox = 0;
                     var weeklyPeriods = subjectWeeklyTotal[key] || 0;
 
                     if (postPct >= target) {
-                        // Formula for max additional classes to bunk: floor((100*P - target*T) / target)
                         marginClasses = Math.floor((100 * postPresent - target * postTotal) / target);
                         marginClasses = Math.max(0, marginClasses);
                         status = 'can_bunk';
                         totalBunkableLeft += marginClasses;
                     } else {
-                        // Formula for required classes to attend: ceil((target*T - 100*P) / (100 - target))
                         marginClasses = Math.ceil((target * postTotal - 100 * postPresent) / (100 - target));
                         marginClasses = Math.max(1, marginClasses);
                         status = 'must_attend';
                         totalMustAttend += marginClasses;
                         dangerCount++;
-                    }
-
-                    if (weeklyPeriods > 0) {
-                        daysApprox = (marginClasses / (weeklyPeriods / 5)).toFixed(1);
                     }
 
                     predictions.push({
@@ -840,7 +1195,6 @@
                         missedInPlan: missedInPlan,
                         status: status,
                         marginClasses: marginClasses,
-                        daysApprox: daysApprox,
                         weeklyPeriods: weeklyPeriods
                     });
                 });
@@ -850,7 +1204,7 @@
                 // Top Summary Cards
                 html += '<div class="bunk-summary">';
                 html += '<div class="summary-card"><div class="summary-label">Target Threshold</div><div class="summary-val" style="color:#4a9eff;">' + target + '%</div><div class="summary-sub">Target attendance</div></div>';
-                html += '<div class="summary-card"><div class="summary-label">Periods Bunked</div><div class="summary-val pct-d">' + totalPeriodsBunked + '</div><div class="summary-sub">' + weeksCount + ' week' + (weeksCount > 1 ? 's' : '') + ' leave</div></div>';
+                html += '<div class="summary-card"><div class="summary-label">Periods Bunked</div><div class="summary-val pct-d">' + totalPeriodsBunked + '</div><div class="summary-sub">In current plan</div></div>';
                 html += '<div class="summary-card"><div class="summary-label">Still Can Bunk</div><div class="summary-val pct-s">' + totalBunkableLeft + ' <span style="font-size:0.85rem;">classes</span></div><div class="summary-sub">Across safe subjects</div></div>';
                 html += '<div class="summary-card"><div class="summary-label">Must Attend</div><div class="summary-val ' + (totalMustAttend > 0 ? 'pct-d' : 'pct-s') + '">' + totalMustAttend + ' <span style="font-size:0.85rem;">classes</span></div><div class="summary-sub">' + dangerCount + ' subject' + (dangerCount !== 1 ? 's' : '') + ' in danger</div></div>';
                 html += '</div>';
@@ -887,7 +1241,6 @@
                     // ====== VIEW 2: DAY-WISE ======
                     html += '<div class="day-cards-grid">';
                     dayNames.forEach(function (day) {
-                        var isBunked = !!selectedDays[day];
                         var items = sched[day] || [];
                         var dayPeriods = 0;
                         var daySubjMap = {};
@@ -901,11 +1254,12 @@
                             daySubjMap[key].count++;
                         });
 
-                        html += '<div class="day-card ' + (isBunked ? 'day-bunked' : '') + '">';
+                        var isBunkedDay = !!selectedDays[day];
+                        html += '<div class="day-card ' + (isBunkedDay ? 'day-bunked' : '') + '">';
                         html += '<div class="day-card-header">';
                         html += '<h3>' + day + '</h3>';
-                        if (isBunked) {
-                            html += '<span class="missed-badge">🚨 Bunking (' + (dayPeriods * weeksCount) + ' periods)</span>';
+                        if (isBunkedDay) {
+                            html += '<span class="missed-badge">🚨 Bunked</span>';
                         } else {
                             html += '<span class="badge-bunk badge-can-bunk" style="font-size:0.75rem;">✅ Attending</span>';
                         }
@@ -937,14 +1291,10 @@
                         html += '</div></div>';
 
                         html += '<div class="day-card-footer">';
-                        if (isBunked) {
-                            if (dayDangerSubjs > 0) {
-                                html += '<span style="color:#f44336; font-weight:600;">⚠️ Bunking ' + day + ' puts ' + dayDangerSubjs + ' subject(s) below ' + target + '%</span>';
-                            } else {
-                                html += '<span style="color:#4caf50; font-weight:600;">🟢 Safe to bunk ' + day + '</span>';
-                            }
+                        if (dayDangerSubjs > 0) {
+                            html += '<span style="color:#f44336; font-weight:600;">⚠️ ' + dayDangerSubjs + ' subject(s) below ' + target + '%</span>';
                         } else {
-                            html += '<span style="color:#888;">Attending all ' + dayPeriods + ' periods on ' + day + '</span>';
+                            html += '<span style="color:#4caf50; font-weight:600;">🟢 All subjects safe</span>';
                         }
                         html += '</div></div>';
                     });
@@ -960,11 +1310,11 @@
                     html += '</tr></thead><tbody>';
 
                     dayNames.forEach(function (day) {
-                        var isBunked = !!selectedDays[day];
+                        var isBunkedDay = !!selectedDays[day];
                         var items = sched[day] || [];
 
-                        html += '<tr class="' + (isBunked ? 'pm-row-bunked' : '') + '">';
-                        html += '<td><strong>' + day + '</strong>' + (isBunked ? '<div style="font-size:0.65rem; color:#f44336;">BUNKING</div>' : '') + '</td>';
+                        html += '<tr class="' + (isBunkedDay ? 'pm-row-bunked' : '') + '">';
+                        html += '<td><strong>' + day + '</strong></td>';
 
                         items.forEach(function (item) {
                             if (!item.subjectCode) {
@@ -975,23 +1325,16 @@
                                 var pred = predictions.find(function (p) { return p.code === codeKey; });
 
                                 html += '<td>';
-                                if (!isBunked) {
-                                    html += '<div class="pm-cell-box pm-box-attending">';
+                                if (pred && pred.status === 'must_attend') {
+                                    html += '<div class="pm-cell-box pm-box-bunked-danger">';
                                     html += '<div>' + (att ? att.name : item.subjectCode) + '</div>';
-                                    html += '<span class="pm-status-tag" style="background:rgba(76,175,80,0.2);">Attending</span>';
+                                    html += '<span class="pm-status-tag" style="background:rgba(244,67,54,0.25);">Must Attend</span>';
                                     html += '</div>';
                                 } else {
-                                    if (pred && pred.status === 'must_attend') {
-                                        html += '<div class="pm-cell-box pm-box-bunked-danger">';
-                                        html += '<div>' + (att ? att.name : item.subjectCode) + '</div>';
-                                        html += '<span class="pm-status-tag" style="background:rgba(244,67,54,0.25);">Bunked (<' + target + '%)</span>';
-                                        html += '</div>';
-                                    } else {
-                                        html += '<div class="pm-cell-box pm-box-bunked-safe">';
-                                        html += '<div style="font-size:0.75rem;">' + (att ? att.name : item.subjectCode) + '</div>';
-                                        html += '<span class="pm-status-tag" style="background:rgba(255,165,0,0.25);">Bunked (Safe)</span>';
-                                        html += '</div>';
-                                    }
+                                    html += '<div class="pm-cell-box pm-box-attending">';
+                                    html += '<div>' + (att ? att.name : item.subjectCode) + '</div>';
+                                    html += '<span class="pm-status-tag" style="background:rgba(76,175,80,0.2);">Safe</span>';
+                                    html += '</div>';
                                 }
                                 html += '</td>';
                             }
@@ -1007,7 +1350,11 @@
                 resultsBox.innerHTML = html;
             }
 
-            // Expose updatePrediction globally so recalculateAll() updates predictor on threshold toggle
+            // Init calendar & subject selectors
+            renderCalendar();
+            updateSelectedDateTags();
+            renderSubjectSelectors();
+
             window.updateBunkPrediction = updatePrediction;
         })();
     </script>
