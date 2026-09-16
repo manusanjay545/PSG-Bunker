@@ -965,14 +965,6 @@ h2 {
     color: #fff;
     font-weight: 500;
     background-color: rgba(74, 158, 255, 0.04);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-}
-
-.timetable tbody td.has-class:hover {
-    filter: brightness(1.3);
-    box-shadow: inset 0 0 0 2px rgba(244, 67, 54, 0.35);
 }
 
 .timetable tbody td.empty-cell {
@@ -1001,25 +993,7 @@ h2 {
     border-left: 2px solid rgba(244, 67, 54, 0.4);
 }
 
-/* Bunked cell state (synced with Subject-by-Subject counters) */
-.timetable tbody td.tt-bunked {
-    background: linear-gradient(135deg, rgba(244, 67, 54, 0.25), rgba(211, 47, 47, 0.2)) !important;
-    color: #ff8a80 !important;
-    border-left: 3px solid #f44336 !important;
-    position: relative;
-    box-shadow: inset 0 0 12px rgba(244, 67, 54, 0.15);
-}
 
-.timetable tbody td.tt-bunked::after {
-    content: '\2715';
-    position: absolute;
-    top: 3px;
-    right: 5px;
-    font-size: 0.6rem;
-    color: #f44336;
-    font-weight: 700;
-    opacity: 0.8;
-}
 
 .timetable tbody tr:last-child td {
     border-bottom: none;
