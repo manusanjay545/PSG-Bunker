@@ -1065,6 +1065,29 @@
                 if (weeksCount < 20) { weeksCount++; weeksValEl.textContent = weeksCount; updatePrediction(); }
             });
 
+            // Calculate effective attendance taking Medical Exception into account
+            function getEffectiveSubjectValues(att) {
+                var total = att.total_hours || 0;
+                var origPresent = att.total_present || 0;
+                var exception = att.exception_hour || 0;
+                var realPct = att.percentage_of_attendance || 0;
+                var medPct = (att.percentage_with_medical !== undefined && att.percentage_with_medical !== null) ? att.percentage_with_medical : realPct;
+
+                if (medicalExceptionIncluded) {
+                    return {
+                        total: total,
+                        present: origPresent + exception,
+                        pct: medPct
+                    };
+                } else {
+                    return {
+                        total: total,
+                        present: origPresent,
+                        pct: realPct
+                    };
+                }
+            }
+
             // ====== MODE 3: INDIVIDUAL SUBJECT SELECTOR ======
             function renderSubjectSelectors() {
                 var grid = document.getElementById('subjSelectorGrid');
@@ -1074,7 +1097,8 @@
                 bunkAttData.forEach(function (att) {
                     var key = att.name;
                     var val = customSubjectBunks[key] || 0;
-                    var pct = att.percentage_of_attendance;
+                    var eff = getEffectiveSubjectValues(att);
+                    var pct = eff.pct;
 
                     html += '<div class="subj-select-card">';
                     html += '<div><div class="subj-select-title">' + (att.course_title || att.name) + '</div>';
@@ -1141,7 +1165,7 @@
             function updatePrediction() {
                 var hasSelection = false;
                 if (activeInputMode === 'subjects') {
-                    hasSelection = Object.values(customSubjectBunks).some(function (v) { return v > 0; });
+                    hasSelection = true; // Always display table and prediction results in Subject-by-Subject mode!
                 } else if (activeInputMode === 'calendar') {
                     hasSelection = Object.keys(selectedCalendarDates).length > 0;
                 } else if (activeInputMode === 'timetable') {
@@ -1150,7 +1174,7 @@
 
                 if (!hasSelection) {
                     if (tabsContainer) tabsContainer.style.display = 'none';
-                    resultsBox.innerHTML = '<div class="bunk-empty"><span class="bunk-empty-icon">👆</span>Set subject bunks or select dates above to calculate attendance predictions!</div>';
+                    resultsBox.innerHTML = '<div class="bunk-empty"><span class="bunk-empty-icon">👆</span>Select dates or timetable periods above to calculate attendance predictions!</div>';
                     return;
                 }
 
@@ -1210,23 +1234,6 @@
                         if (!subjectMissed[key]) subjectMissed[key] = 0;
                         subjectMissed[key]++;
                     });
-                } else if (activeInputMode === 'days') {
-                    // Calculate from selected weekdays & weeks
-                    dayNames.forEach(function (day) {
-                        var items = sched[day] || [];
-                        var isBunked = !!selectedDays[day];
-                        items.forEach(function (item) {
-                            if (!item.subjectCode) return;
-                            var att = matchSubject(item.subjectCode);
-                            if (!att) return;
-                            var key = att.name;
-                            if (!subjectMissed[key]) subjectMissed[key] = 0;
-                            if (!subjectAttended[key]) subjectAttended[key] = 0;
-
-                            if (isBunked) subjectMissed[key] += weeksCount;
-                            else subjectAttended[key] += weeksCount;
-                        });
-                    });
                 } else if (activeInputMode === 'subjects') {
                     // Calculate from individual subject counter inputs
                     bunkAttData.forEach(function (att) {
@@ -1244,8 +1251,10 @@
 
                 bunkAttData.forEach(function (att) {
                     var key = att.name;
-                    var curTotal = att.total_hours;
-                    var curPresent = att.total_present;
+                    var eff = getEffectiveSubjectValues(att);
+                    var curTotal = eff.total;
+                    var curPresent = eff.present;
+                    var curPct = eff.pct;
 
                     var missedInPlan = subjectMissed[key] || 0;
                     var attendedInPlan = subjectAttended[key] || 0;
@@ -1276,7 +1285,7 @@
                     predictions.push({
                         title: att.course_title || att.name,
                         code: att.name,
-                        curPct: att.percentage_of_attendance,
+                        curPct: curPct,
                         postPct: postPct,
                         curPresent: curPresent,
                         curTotal: curTotal,
