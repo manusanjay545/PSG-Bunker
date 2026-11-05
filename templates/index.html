@@ -64,6 +64,8 @@
             justify-content: center;
             min-height: 100vh;
             background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            flex-direction: column;
+            padding: 1rem 0;
         }
 
         .login-box {
@@ -290,7 +292,33 @@
             border-radius: 4px;
         }
 
+        /* Ad slots - fixed size so the layout doesn't jump while ads load */
+        .ad-slot {
+            width: 100%;
+            height: 50px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
+        .ad-inner {
+            width: 320px;
+            height: 50px;
+            flex-shrink: 0;
+        }
+
+        .ad-slot--top { margin-bottom: 1rem; }
+        .ad-slot--bottom { margin-top: 1rem; }
+
+        /* Very narrow phones: shrink the 320px banner to fit */
+        @media (max-width: 380px) {
+            .ad-inner {
+                transform: scale(0.85);
+                transform-origin: center;
+            }
+        }
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
@@ -337,6 +365,20 @@
 <body>
     
     <div class="login-container">
+        <!-- Top ad -->
+        <div class="ad-slot ad-slot--top"><div class="ad-inner">
+                <script>
+                    atOptions = {
+                        'key' : '14a14257eff65c8df579677d2f966d99',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                    };
+                </script>
+                <script src="https://www.highrevenueformat.com/14a14257eff65c8df579677d2f966d99/invoke.js"></script>
+            </div></div>
+
         <div class="login-box">
             <div class="logo-section">
                 <div class="logo-circle">
@@ -386,9 +428,21 @@
                 </p>
             </footer>
         </div>
+
+        <!-- Bottom ad -->
+        <div class="ad-slot ad-slot--bottom"><div class="ad-inner">
+                <script>
+                    atOptions = {
+                        'key' : '14a14257eff65c8df579677d2f966d99',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                    };
+                </script>
+                <script src="https://www.highrevenueformat.com/14a14257eff65c8df579677d2f966d99/invoke.js"></script>
+            </div></div>
     </div>
-
-
 
     <script>
         // ====== APK DOWNLOAD URL ======
